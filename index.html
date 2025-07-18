@@ -1,0 +1,2843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veridian City Studios - A Retro Gaming Community Memecoin</title>
+    <link id="favicon" rel="icon" href="">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base Styles --- */
+        html {
+            height: 100%;
+        }
+        body {
+            font-family: var(--font-family, 'Press Start 2P', cursive);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            transition: background-color 0.5s, color 0.5s;
+            min-height: 100%;
+        }
+        .glitch {
+            animation: glitch-anim 0.2s infinite;
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+
+        /* --- Dynamic Backgrounds --- */
+        #dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+        .theme-vaporwave #dynamic-bg {
+            background: linear-gradient(to bottom, #0d0221 0%, #261447 100%);
+        }
+        .theme-vaporwave .scanline {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--pixel-color);
+            opacity: 0.1;
+            animation: scanline 7s linear infinite;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-10px); }
+            100% { transform: translateY(100vh); }
+        }
+        .theme-ocean .bubble {
+            position: absolute;
+            background: var(--pixel-color);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: rise 10s infinite ease-in;
+        }
+        @keyframes rise {
+            0% { transform: translateY(100vh) scale(1); }
+            100% { transform: translateY(-10vh) scale(0); }
+        }
+        .theme-virtual .grid-line {
+            position: absolute;
+            background: var(--pixel-color);
+            opacity: 0.2;
+            animation: strobe 2s infinite alternate;
+        }
+        @keyframes strobe {
+            0% { opacity: 0.05; }
+            100% { opacity: 0.15; }
+        }
+        .theme-forest .leaf {
+            position: absolute;
+            background-color: var(--header-sub-color);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: fall 12s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+            100% { transform: translateY(110vh) translateX(100px) rotate(360deg); }
+        }
+        @keyframes blueprintPulse {
+            0% { opacity: 0.05; }
+            100% { opacity: 0.25; }
+        }
+        @keyframes blueprintFloat {
+            0% { 
+                transform: translateY(0) translateX(0) rotate(0deg); 
+                opacity: 0.1; 
+            }
+            50% { 
+                opacity: 0.3; 
+            }
+            100% { 
+                transform: translateY(-50px) translateX(30px) rotate(180deg); 
+                opacity: 0.1; 
+            }
+        }
+        .theme-sunset .sunset-glow {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            width: 40vw;
+            height: 40vw;
+            max-width: 400px;
+            max-height: 400px;
+            background: radial-gradient(circle, var(--header-sub-color) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            animation: pulse 5s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: translateX(-50%) scale(0.95); }
+            100% { opacity: 0.5; transform: translateX(-50%) scale(1.05); }
+        }
+        .theme-arcade #dynamic-bg {
+            background-color: #1a0221;
+            background-image: var(--arcade-carpet-svg);
+            background-size: 300px;
+            animation: scroll-carpet 20s linear infinite;
+        }
+        @keyframes scroll-carpet {
+            0% { background-position: 0 0; }
+            100% { background-position: 300px 300px; }
+        }
+        .theme-blueprint #dynamic-bg {
+            background-color: var(--bg-color);
+            background-image: linear-gradient(var(--pixel-color) 1px, transparent 1px), linear-gradient(to right, var(--pixel-color) 1px, var(--bg-color) 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+        .theme-sakura .petal {
+            position: absolute;
+            background: var(--header-sub-color);
+            border-radius: 10% 50%;
+            opacity: 0.7;
+            animation: flutter 15s linear infinite;
+        }
+        @keyframes flutter {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+
+        /* --- Easter Egg: Pixel Rain Canvas --- */
+        #pixelRainCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+        }
+        
+        /* --- Animated Sprites --- */
+        .animated-sprite {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            background-color: var(--pixel-color);
+            z-index: 9998;
+            pointer-events: none;
+            opacity: 0;
+            animation: fly-by 10s linear;
+        }
+        @keyframes fly-by {
+            0% { transform: translateX(-100px); opacity: 1; }
+            100% { transform: translateX(110vw); opacity: 1; }
+        }
+
+        /* --- Color Themes --- */
+        :root { /* Default Game Boy Green Theme */
+            --font-family: 'Press Start 2P', cursive;
+            --bg-color: #0d2b1d; --text-color: #306230; --header-color: #c4f2c5; --header-sub-color: #76b876; --gb-body-color: #c4c4c4; --gb-body-shadow1: #a9a9a9; --gb-body-shadow2: #e0e0e0; --screen-bg: #9bbc0f; --screen-border: #8bac0f; --screen-text: #0d2b1d; --pixel-color: #306230; --button-color: #a02060; --button-shadow: #601040; --dpad-color: #333;
+            --pet-body-color: #76b876; --pet-eye-color: #0d2b1d; --modal-text-color: #0d2b1d; --action-btn-text-color: #fff;
+        }
+        .theme-pocket { /* Game Boy Pocket - Grayscale */
+            --bg-color: #111; --text-color: #777; --header-color: #fff; --header-sub-color: #bbb; --gb-body-color: #c4c4c4; --gb-body-shadow1: #a9a9a9; --gb-body-shadow2: #e0e0e0; --screen-bg: #e0e0e0; --screen-border: #c4c4c4; --screen-text: #000; --pixel-color: #777; --button-color: #a02060; --button-shadow: #601040; --dpad-color: #333;
+            --pet-body-color: #bbb; --pet-eye-color: #111; --modal-text-color: #000; --action-btn-text-color: #fff;
+        }
+        .theme-light { /* Game Boy Light - Teal */
+            --bg-color: #003d3d; --text-color: #008080; --header-color: #66cccc; --header-sub-color: #339999; --gb-body-color: #c4c4c4; --gb-body-shadow1: #a9a9a9; --gb-body-shadow2: #e0e0e0; --screen-bg: #c4f2c5; --screen-border: #76b876; --screen-text: #003d3d; --pixel-color: #008080; --button-color: #a02060; --button-shadow: #601040; --dpad-color: #333;
+            --pet-body-color: #339999; --pet-eye-color: #003d3d; --modal-text-color: #002929; --modal-bg-color: #d4d4d4; --action-btn-text-color: #fff;
+        }
+        .theme-virtual { /* Virtual Boy - Red & Black */
+            --bg-color: #000; --text-color: #ff0000; --header-color: #ff5555; --header-sub-color: #cc0000; --gb-body-color: #222; --gb-body-shadow1: #111; --gb-body-shadow2: #333; --screen-bg: #220000; --screen-border: #110000; --screen-text: #ff0000; --pixel-color: #ff0000; --button-color: #555; --button-shadow: #222; --dpad-color: #444;
+            --pet-body-color: #ff0000; --pet-eye-color: #000; --modal-text-color: #ff6666; --modal-bg-color: #1a0000; --action-btn-text-color: #fff;
+        }
+        .theme-blue { /* Blue Edition */
+            --bg-color: #001f3f; --text-color: #7FDBFF; --header-color: #7FDBFF; --header-sub-color: #0074D9; --gb-body-color: #4a90e2; --gb-body-shadow1: #3a7bc8; --gb-body-shadow2: #5aa4fc; --screen-bg: #a2d2ff; --screen-border: #4a90e2; --screen-text: #001f3f; --pixel-color: #7FDBFF; --button-color: #ff4136; --button-shadow: #c2322a; --dpad-color: #001f3f;
+            --pet-body-color: #7FDBFF; --pet-eye-color: #001f3f; --modal-text-color: #001f3f; --modal-bg-color: #5aa4fc; --action-btn-text-color: #fff;
+        }
+        .theme-grape { /* Grape Edition */
+            --bg-color: #2c004a; --text-color: #9d4edd; --header-color: #e0aaff; --header-sub-color: #c77dff; --gb-body-color: #5a189a; --gb-body-shadow1: #48137b; --gb-body-shadow2: #6b1d9a; --screen-bg: #e0c3fc; --screen-border: #c999ff; --screen-text: #2c004a; --pixel-color: #9d4edd; --button-color: #3c096c; --button-shadow: #240046; --dpad-color: #3c096c;
+            --pet-body-color: #e0aaff; --pet-eye-color: #2c004a; --modal-text-color: #e0aaff; --modal-bg-color: #3c004a; --action-btn-text-color: #fff;
+        }
+        .theme-kiwi { /* Kiwi Edition */
+            --bg-color: #386641; --text-color: #a7c957; --header-color: #f2e8cf; --header-sub-color: #a7c957; --gb-body-color: #6a994e; --gb-body-shadow1: #588142; --gb-body-shadow2: #7ba85a; --screen-bg: #e9f5db; --screen-border: #cdeac0; --screen-text: #386641; --pixel-color: #a7c957; --button-color: #bc4749; --button-shadow: #a43d3f; --dpad-color: #386641;
+            --pet-body-color: #a7c957; --pet-eye-color: #386641; --modal-text-color: #f2e8cf; --modal-bg-color: #4a6c51; --action-btn-text-color: #fff;
+        }
+        .theme-atomic { /* Atomic Yellow */
+            --bg-color: #3D2B00; --text-color: #FFBF00; --header-color: #FFD700; --header-sub-color: #FFBF00; --gb-body-color: #FFBF00; --gb-body-shadow1: #cca000; --gb-body-shadow2: #ffd02a; --screen-bg: #4d4d4d; --screen-border: #333333; --screen-text: #fff; --pixel-color: #fff; --button-color: #333; --button-shadow: #111; --dpad-color: #333;
+            --pet-body-color: #FFBF00; --pet-eye-color: #3D2B00; --modal-text-color: #3D2B00; --action-btn-text-color: #fff;
+        }
+        .theme-berry { /* Berry Pink */
+            --bg-color: #4a002a; --text-color: #ff4081; --header-color: #ff80ab; --header-sub-color: #ff4081; --gb-body-color: #f50057; --gb-body-shadow1: #c40046; --gb-body-shadow2: #f73378; --screen-bg: #fce4ec; --screen-border: #f8bbd0; --screen-text: #880e4f; --pixel-color: #ff4081; --button-color: #880e4f; --button-shadow: #560027; --dpad-color: #880e4f;
+            --pet-body-color: #ff80ab; --pet-eye-color: #4a002a; --modal-text-color: #fff; --action-btn-text-color: #fff;
+        }
+        .theme-jungle { /* Jungle Green */
+            --bg-color: #003300; --text-color: #008000; --header-color: #66ff66; --header-sub-color: #00cc00; --gb-body-color: #006400; --gb-body-shadow1: #004d00; --gb-body-shadow2: #007b00; --screen-bg: #e0f0e0; --screen-border: #a0c0a0; --screen-text: #003300; --pixel-color: #008000; --button-color: #ff8c00; --button-shadow: #cc7000; --dpad-color: #003300;
+            --pet-body-color: #00cc00; --pet-eye-color: #003300; --modal-text-color: #66ff66; --action-btn-text-color: #000;
+        }
+        .theme-sunset { /* Sunset Edition */
+            --bg-color: #2c0e3a; --text-color: #ff8c42; --header-color: #ffc857; --header-sub-color: #e57c3d; --gb-body-color: #4f3a65; --gb-body-shadow1: #3a2a4a; --gb-body-shadow2: #644a80; --screen-bg: #fbe6d1; --screen-border: #f7ad7a; --screen-text: #3c1e28; --pixel-color: #ff8c42; --button-color: #9d4edd; --button-shadow: #6b2fa8; --dpad-color: #3a2a4a;
+            --pet-body-color: #ff8c42; --pet-eye-color: #2c0e3a; --modal-text-color: #ffc857; --action-btn-text-color: #fff;
+        }
+        .theme-ocean { /* Ocean Edition */
+            --bg-color: #023047; --text-color: #8ecae6; --header-color: #8ecae6; --header-sub-color: #219ebc; --gb-body-color: #ffb703; --gb-body-shadow1: #d49a02; --gb-body-shadow2: #ffc32b; --screen-bg: #caf0f8; --screen-border: #ade8f4; --screen-text: #023047; --pixel-color: #8ecae6; --button-color: #fb8500; --button-shadow: #d47000; --dpad-color: #023047;
+            --pet-body-color: #8ecae6; --pet-eye-color: #023047; --modal-text-color: #023047; --action-btn-text-color: #fff;
+        }
+        .theme-forest { /* Forest Edition */
+            --bg-color: #283618; --text-color: #fefae0; --header-color: #fefae0; --header-sub-color: #dda15e; --gb-body-color: #dda15e; --gb-body-shadow1: #b9894e; --gb-body-shadow2: #e1b96e; --screen-bg: #fefae0; --screen-border: #dda15e; --screen-text: #283618; --pixel-color: #fefae0; --button-color: #bc6c25; --button-shadow: #9e5a1f; --dpad-color: #606c38;
+            --pet-body-color: #dda15e; --pet-eye-color: #283618; --modal-text-color: #283618; --action-btn-text-color: #fff;
+        }
+        .theme-vaporwave { /* Vaporwave Edition */
+            --bg-color: #0d0221; --text-color: #ff00ff; --header-color: #00f0ff; --header-sub-color: #ff00ff; --gb-body-color: #261447; --gb-body-shadow1: #1a0d30; --gb-body-shadow2: #321b5d; --screen-bg: #1a0d30; --screen-border: #a98de0; --screen-text: #ff33c1; --pixel-color: #00f0ff; --button-color: #f9c22e; --button-shadow: #d1a326; --dpad-color: #1a0d30;
+            --pet-body-color: #00f0ff; --pet-eye-color: #0d0221; --modal-text-color: #ff66ff; --modal-bg-color: #0f0423; --action-btn-text-color: #000;
+        }
+        .theme-amber { /* Monochrome Amber */
+            --bg-color: #1a1004; --text-color: #ff9a00; --header-color: #ffc500; --header-sub-color: #ff9a00; --gb-body-color: #7a551a; --gb-body-shadow1: #5b4013; --gb-body-shadow2: #996a21; --screen-bg: #3d2d0c; --screen-border: #291e08; --screen-text: #ffb700; --pixel-color: #ff9a00; --button-color: #1a1004; --button-shadow: #000; --dpad-color: #1a1004;
+            --pet-body-color: #ff9a00; --pet-eye-color: #1a1004; --modal-text-color: #ffc500; --action-btn-text-color: #ffc500;
+        }
+        .theme-miami { /* Miami Vice */
+            --bg-color: #010029; --text-color: #00f0ff; --header-color: #ff33c1; --header-sub-color: #00f0ff; --gb-body-color: #e0e0e0; --gb-body-shadow1: #a9a9a9; --gb-body-shadow2: #f5f5f5; --screen-bg: #d1f7ff; --screen-border: #a3eaf0; --screen-text: #ff33c1; --pixel-color: #00f0ff; --button-color: #ff33c1; --button-shadow: #c22897; --dpad-color: #333;
+            --pet-body-color: #ff33c1; --pet-eye-color: #333; --modal-text-color: #ff33c1; --action-btn-text-color: #fff;
+        }
+        .theme-arcade {
+            --bg-color: #1a0221; --text-color: #f0f; --header-color: #0ff; --header-sub-color: #f0f; --gb-body-color: #3d3d3d; --gb-body-shadow1: #222; --gb-body-shadow2: #555; --screen-bg: #222; --screen-border: #111; --screen-text: #fff; --pixel-color: #f0f; --button-color: #0ff; --button-shadow: #0aa; --dpad-color: #555;
+            --pet-body-color: #f0f; --pet-eye-color: #0ff; --modal-text-color: #ffffff; --modal-bg-color: #2a0831; --action-btn-text-color: #000;
+            --arcade-carpet-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23ff00ff' fill-opacity='0.1'%3E%3Cpath d='M0 50 L50 0 L100 50 L50 100 Z'/%3E%3C/g%3E%3Cg fill='%2300ffff' fill-opacity='0.1'%3E%3Ccircle cx='50' cy='50' r='25'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .theme-blueprint {
+            --bg-color: #002b4d; --text-color: #fff; --header-color: #fff; --header-sub-color: #87ceeb; --gb-body-color: #003f7a; --gb-body-shadow1: #002b4d; --gb-body-shadow2: #00509e; --screen-bg: #002b4d; --screen-border: #87ceeb; --screen-text: #fff; --pixel-color: #87ceeb; --button-color: #fff; --button-shadow: #ccc; --dpad-color: #fff;
+            --pet-body-color: #87ceeb; --pet-eye-color: #002b4d; --modal-text-color: #ffffff; --modal-bg-color: #003f7a; --action-btn-text-color: #002b4d;
+        }
+        .theme-blueprint .pixel-border, .theme-blueprint .modal-content, .theme-blueprint .pixel-border-inset {
+            border-style: dashed;
+            border-width: 2px;
+        }
+        .theme-sakura {
+            --bg-color: #ffe5f0; --text-color: #c2185b; --header-color: #ad1457; --header-sub-color: #880e4f; --gb-body-color: #f8bbd0; --gb-body-shadow1: #f48fb1; --gb-body-shadow2: #fce4ec; --screen-bg: #fff; --screen-border: #f48fb1; --screen-text: #880e4f; --pixel-color: #c2185b; --button-color: #ad1457; --button-shadow: #880e4f; --dpad-color: #fff;
+            --pet-body-color: #ad1457; --pet-eye-color: #fff; --modal-text-color: #880e4f; --action-btn-text-color: #fff;
+        }
+
+        /* --- Time Travel Eras --- */
+        .era-1985 {
+            --font-family: monospace;
+            --bg-color: #000; --text-color: #00AAAA; --header-color: #FFFFFF; --header-sub-color: #FF55FF; --gb-body-color: #000000; --gb-body-shadow1: #000; --gb-body-shadow2: #000; --screen-bg: #0000AA; --screen-border: #00AAAA; --screen-text: #FFFFFF; --pixel-color: #FF55FF; --button-color: #00AAAA; --button-shadow: #000; --dpad-color: #00AAAA;
+            --pet-body-color: #FF55FF; --pet-eye-color: #FFFFFF; --modal-text-color: #FFFFFF; --action-btn-text-color: #000;
+        }
+        .era-1995 {
+            --font-family: Arial, sans-serif;
+            --bg-color: #008080; --text-color: #000; --header-color: #000000; --header-sub-color: #333; --gb-body-color: #C0C0C0; --gb-body-shadow1: #808080; --gb-body-shadow2: #DFDFDF; --screen-bg: #C0C0C0; --screen-border: #808080; --screen-text: #000; --pixel-color: #000080; --button-color: #C0C0C0; --button-shadow: #808080; --dpad-color: #C0C0C0;
+            --pet-body-color: #808080; --pet-eye-color: #FFFFFF; --modal-text-color: #000; --action-btn-text-color: #000;
+        }
+        
+        /* --- Element Styling using CSS Variables --- */
+        .pixel-border, .modal-content { border: 4px solid var(--pixel-color); box-shadow: 4px 4px 0px #000, -4px -4px 0px #000, 4px -4px 0px #000, -4px 4px 0px #000, 0px 0px 0px 4px #000; image-rendering: pixelated; }
+        .era-1995 .pixel-border, .era-1995 .modal-content { border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; box-shadow: 1px 1px 0px #000; }
+        .pixel-border-inset { border: 4px solid var(--pixel-color); box-shadow: inset 4px 4px 0px #000; background-color: var(--bg-color); }
+        .era-1995 .pixel-border-inset { border-style: solid; border-width: 2px; border-color: #808080 #DFDFDF #DFDFDF #808080; box-shadow: none; }
+        
+        .gameboy-body { background-color: var(--gb-body-color); border-radius: 10px 10px 80px 10px; padding: 25px; border: 2px solid #333; box-shadow: inset 5px 5px 0px var(--gb-body-shadow1), inset -5px -5px 0px var(--gb-body-shadow2); transition: background-color 0.5s; position: relative; }
+        .gameboy-screen-container { position: relative; background-color: var(--screen-border); border-radius: 10px; padding: 20px; box-shadow: inset 0 0 15px rgba(0,0,0,0.3); transition: background-color 0.5s; margin-bottom: 20px; }
+        #gameCanvas { background-color: var(--screen-bg); image-rendering: pixelated; width: 100%; transition: background-color 0.5s; }
+        .header-main { color: var(--header-color); cursor: pointer; animation: header-glow 2s ease-in-out infinite alternate; }
+        @keyframes header-glow {
+            from { text-shadow: 0 0 5px var(--header-color); }
+            to { text-shadow: 0 0 20px var(--header-sub-color); }
+        }
+        .header-sub { color: var(--header-sub-color); }
+        .d-pad-btn { background-color: var(--dpad-color); border: 1px solid rgba(0,0,0,0.2); }
+        .era-1995 .d-pad-btn { border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; }
+        .action-btn { background-color: var(--button-color); border-color: var(--button-shadow); box-shadow: 2px 2px 0 var(--button-shadow); color: var(--action-btn-text-color); }
+        .era-1995 .action-btn { border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; box-shadow: none; color: #000; }
+        .social-btn { background-color: var(--pixel-color); color: var(--bg-color); }
+        .social-btn:hover { background-color: var(--bg-color); color: var(--pixel-color); }
+        .era-1995 .social-btn { background-color: #C0C0C0; color: #000; border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; box-shadow: none; }
+        .era-1995 .social-btn:hover { background-color: #b0b0b0; }
+        
+        #settings-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 10001;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--header-color);
+        }
+        #settings-icon svg {
+            color: var(--header-color);
+            width: 24px;
+            height: 24px;
+        }
+
+        /* --- Modals --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 1rem; }
+        .modal-content { background-color: var(--modal-bg-color, var(--gb-body-color)); padding: 20px; max-width: 500px; width: 100%; color: var(--modal-text-color);}
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--header-color); }
+        .close-modal { 
+            font-size: 24px; 
+            cursor: pointer; 
+            color: var(--header-color);
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .close-modal:hover {
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        /* --- Interactive Theme Selector (FIXED) --- */
+        #theme-modal .modal-content {
+            max-width: 700px;
+            max-height: 85vh; /* Ensure modal doesn't overflow viewport height */
+            display: flex;
+            flex-direction: column;
+        }
+        .theme-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Increased min size for better touch targets */
+            gap: 20px;
+            overflow-y: auto; /* Allow vertical scrolling */
+            flex-grow: 1; /* Allow grid to fill available space */
+            padding: 1rem; /* Add some internal padding */
+        }
+        .theme-swatch { 
+            cursor: pointer;
+        }
+        .theme-swatch .mini-gameboy {
+             border: 2px solid transparent;
+             transition: border-color: 0.2s;
+        }
+        .theme-swatch:hover .mini-gameboy {
+            border-color: var(--header-color);
+        }
+        .theme-label {
+            color: var(--modal-text-color);
+            text-shadow: 1px 1px #00000050;
+            word-break: break-word; /* Prevent long names from breaking layout */
+        }
+        .mini-gameboy {
+            background-color: var(--gb-body-color);
+            border-radius: 5px 5px 20px 5px;
+            padding: 5px;
+            box-shadow: inset 2px 2px 0px var(--gb-body-shadow1), inset -2px -2px 0px var(--gb-body-shadow2);
+            width: 100%;
+            height: 80px;
+        }
+        .mini-screen-container {
+            background-color: var(--screen-border);
+            border-radius: 3px;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+        .mini-screen {
+            background-color: var(--screen-bg);
+            height: 25px;
+            border-radius: 2px;
+        }
+        .mini-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+        }
+        .mini-dpad {
+            width: 15px;
+            height: 15px;
+            background-color: var(--dpad-color);
+            clip-path: polygon(30% 0%, 70% 0%, 70% 30%, 100% 30%, 100% 70%, 70% 70%, 70% 100%, 30% 100%, 30% 70%, 0% 70%, 0% 30%, 30% 30%);
+        }
+        .mini-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        .mini-button {
+            width: 10px;
+            height: 10px;
+            background-color: var(--button-color);
+            border-radius: 50%;
+        }
+        
+        /* --- Settings/Radio Modal --- */
+        #settings-modal label, #settings-modal h3 {
+            color: var(--modal-text-color);
+            text-shadow: 1px 1px rgba(0,0,0,0.2);
+        }
+        #settings-modal .social-btn {
+            background-color: var(--pixel-color);
+            color: var(--screen-bg);
+        }
+        .theme-blue #settings-modal .social-btn,
+        .theme-forest #settings-modal .social-btn {
+            color: var(--screen-text);
+        }
+        #settings-modal .social-btn:hover {
+            background-color: var(--screen-bg);
+            color: var(--pixel-color);
+        }
+        #pet-name-input {
+            background-color: var(--screen-bg);
+            color: var(--screen-text);
+            border: 2px solid var(--pixel-color);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+        }
+        #pet-name-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        .reset-btn {
+            background-color: #a02060 !important;
+            color: #fff !important;
+            border-color: #601040 !important;
+        }
+        .reset-btn:hover {
+            background-color: #c03070 !important;
+        }
+
+        /* --- Sticker Customization --- */
+        #sticker-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allow clicks to pass through to elements underneath */
+        }
+        #sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .sticker-item {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--pixel-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            image-rendering: pixelated;
+            background-color: var(--screen-bg);
+            color: var(--screen-text);
+            opacity: 0.5;
+        }
+        .sticker-item.unlocked {
+            opacity: 1;
+        }
+        .placed-sticker {
+            position: absolute;
+            width: 96px;
+            height: 96px;
+            cursor: move;
+            z-index: 5;
+            user-select: none;
+            font-size: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 3px 3px #000;
+            pointer-events: auto; /* Make sure the sticker itself is clickable/draggable */
+        }
+
+
+        /* --- Game Case Modal --- */
+        #game-cartridge-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 25px; 
+            padding: 20px;
+            justify-items: center;
+        }
+        .game-cartridge {
+            position: relative; background-color: var(--dpad-color, #777); border-radius: 10px 4px 10px 10px; padding: 8px; cursor: pointer; width: 140px; height: 125px; display: flex; flex-direction: column;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.4), inset 1px 1px 0px rgba(255,255,255,0.3), inset -1px -1px 0px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-in-out;
+        }
+        .game-cartridge:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 6px 8px 5px rgba(0,0,0,0.3), inset 1px 1px 0px rgba(255,255,255,0.3), inset -1px -1px 0px rgba(0,0,0,0.3);
+        }
+        .cartridge-label-area {
+            background-color: var(--screen-border, #ccc); border-radius: 6px; padding: 5px; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.5); flex-grow: 1; display: flex; flex-direction: column; justify-content: center; margin-bottom: 8px;
+        }
+        .cartridge-label-art {
+            background-color: var(--screen-bg, #eee); color: var(--screen-text, #111); border-radius: 4px; height: 60px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;
+        }
+        .cartridge-title {
+            background-color: #fff; color: #000; font-size: 10px; font-family: Arial, sans-serif; text-align: center; padding: 2px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .cartridge-grip {
+            height: 8px; background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px); border-radius: 0 0 5px 5px;
+        }
+        
+        #games-nav { background: transparent; border: none; box-shadow: none; color: var(--screen-text); font-weight: bold; text-decoration: none; }
+        #games-nav:hover { color: var(--header-color); text-decoration: underline; }
+
+        /* --- News Ticker --- */
+        #news-ticker-container { background-color: var(--gb-body-color); color: var(--screen-text); overflow: hidden; white-space: nowrap; border: 4px solid var(--pixel-color); margin-bottom: 20px; padding: 4px 0; }
+        #news-ticker { display: inline-block; padding-left: 100%; animation: scroll-left 30s linear infinite; }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* --- Achievement System --- */
+        #achievement-unlocked {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background-color: #222; color: #fff; z-index: 10002; padding: 15px; transition: top 0.5s ease-in-out;
+            border: 4px solid #fff; box-shadow: 4px 4px 0px #000, -4px -4px 0px #000, 4px -4px 0px #000, -4px 4px 0px #000, 0px 0px 0px 4px #000; image-rendering: pixelated;
+        }
+        #achievement-unlocked.show { top: 20px; }
+        .achievement-item { opacity: 0.5; }
+        .achievement-item.unlocked { opacity: 1; }
+
+        /* --- Tokenomics, Roadmap, Team --- */
+        .chart-bar { background-color: var(--pixel-color); height: 24px; margin-bottom: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: var(--bg-color); font-size: 12px; box-shadow: inset 2px 2px 0px rgba(0,0,0,0.3); }
+        .roadmap-container { display: flex; flex-direction: column; align-items: center; }
+        .roadmap-node { display: flex; align-items: center; margin-bottom: 10px; width: 100%; cursor: pointer; }
+        .roadmap-node.completed .node-icon { background-color: var(--header-color); }
+        .roadmap-node.completed .node-text { text-decoration: line-through; opacity: 0.7; }
+        .node-icon { width: 30px; height: 30px; border: 4px solid var(--pixel-color); margin-right: 20px; flex-shrink: 0; }
+        .node-text { font-size: 14px; }
+        .roadmap-connector { width: 4px; height: 30px; background-color: var(--pixel-color); margin-left: 13px; }
+        
+        #pokedex-container {
+            display: flex;
+            background-color: var(--gb-body-color);
+            border: 4px solid var(--pixel-color);
+            border-radius: 10px 0 10px 10px;
+            padding: 15px;
+            gap: 15px;
+            flex-direction: column;
+        }
+        @media (min-width: 640px) {
+            #pokedex-container { flex-direction: row; }
+        }
+        .pokedex-left {
+            flex-basis: 40%;
+            background-color: var(--gb-body-shadow1);
+            border-radius: 5px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pokedex-avatar-container {
+            background-color: var(--screen-bg);
+            border: 4px solid var(--screen-border);
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .pokedex-avatar-container img {
+            width: 100%;
+            image-rendering: pixelated;
+        }
+        .pokedex-lights {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .pokedex-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #000;
+        }
+        .pokedex-light.red { background-color: #ff0000; }
+        .pokedex-light.yellow { background-color: #ffff00; }
+        .pokedex-light.green { background-color: #00ff00; }
+
+        .pokedex-right {
+            flex-basis: 60%;
+            background-color: var(--screen-bg);
+            color: var(--screen-text);
+            border: 4px solid var(--screen-border);
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        #pioneer-name {
+            font-size: 1.25rem;
+            color: var(--pixel-color);
+            margin-bottom: 5px;
+        }
+        #pioneer-title {
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+        .pokedex-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .pokedex-nav-btn {
+            width: 40px;
+            height: 40px;
+            background-color: var(--dpad-color);
+            color: var(--header-color);
+            border: 2px solid #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Pixel Pet & Chatbot --- */
+        #pixel-pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 50; cursor: pointer; user-select: none; }
+        #chatbot-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 50; cursor: pointer; user-select: none; width: 48px; height: 48px; }
+        #chatbot-toggle svg { width: 100%; height: 100%; color: var(--pixel-color); background-color: var(--gb-body-color); border: 4px solid var(--pixel-color); border-radius: 50%; padding: 8px; }
+        #pixel-pet { width: 48px; height: 48px; position: relative; }
+        .pet-body { position: absolute; width: 100%; height: 80%; bottom: 0; background-color: var(--pet-body-color); border-radius: 50% 50% 10px 10px; transition: all 0.2s ease-in-out; }
+        .pet-eye { position: absolute; width: 8px; height: 8px; background-color: var(--pet-eye-color); border-radius: 50%; top: 20px; transition: all 0.2s ease-in-out; }
+        .pet-eye.left { left: 10px; }
+        .pet-eye.right { right: 10px; }
+        .pet-mouth { position: absolute; width: 12px; height: 4px; background-color: var(--pet-eye-color); bottom: 12px; left: 18px; border-radius: 0 0 4px 4px; opacity: 0; transition: all 0.2s ease-in-out; }
+        #pet-thought-bubble { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--screen-bg); border: 2px solid var(--screen-text); border-radius: 10px; padding: 5px 10px; display: none; font-size: 10px; color: var(--screen-text); white-space: nowrap; }
+        #pet-thought-bubble.show { display: block; }
+
+        /* --- Chatbot Modal --- */
+        #chatbot-modal .modal-content { background-color: #000; border-color: var(--header-color); color: var(--header-color); max-width: 600px; }
+        #chatbot-screen { background-color: #111; height: 300px; overflow-y: auto; padding: 10px; border: 2px solid var(--header-color); margin-bottom: 10px; font-size: 12px; line-height: 1.5; }
+        #chatbot-screen p { margin-bottom: 8px; }
+        .user-message { color: var(--header-sub-color); } /* Changed from --text-color for better contrast in some themes */
+        .bot-message { color: var(--header-color); }
+        #chatbot-input-container { display: flex; }
+        #chatbot-input { background: transparent; border: none; border-bottom: 2px solid var(--header-color); color: var(--header-color); flex-grow: 1; padding: 5px; outline: none; }
+        .blinking-cursor { animation: blink 1s step-end infinite; }
+
+        /* --- Pixel Art Creator --- */
+        #pixel-art-grid { display: grid; grid-template-columns: repeat(16, 1fr); border: 2px solid var(--pixel-color); image-rendering: pixelated; cursor: crosshair; }
+        .pixel-cell { width: 100%; padding-bottom: 100%; background-color: var(--screen-bg); }
+        .color-palette { display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; gap: 5px; }
+        .palette-color, .tool-btn { width: 24px; height: 24px; cursor: pointer; border: 2px solid #000; display: flex; align-items: center; justify-content: center; background-color: var(--gb-body-shadow1); }
+        .palette-color.selected, .tool-btn.selected { border-color: var(--header-color); transform: scale(1.2); box-shadow: 0 0 5px var(--header-color); }
+        .tool-icon { width: 16px; height: 16px; stroke: var(--text-color); fill: var(--text-color); }
+        #pixel-art-controls { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        #pixel-art-tools { display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
+
+        /* --- Power On Sequence --- */
+        #power-on-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 10;
+            display: flex; justify-content: center; align-items: center; transition: opacity 1s;
+        }
+        #power-on-logo { color: #fff; font-size: 2rem; opacity: 0; animation: fadeInOut 3s ease-in-out; }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+        /* Pet Animations & States */
+        #pixel-pet.idle { animation: pet-idle 2s ease-in-out infinite; }
+        #pixel-pet.happy { animation: pet-happy 0.5s ease-in-out; }
+        #pixel-pet.curious { animation: pet-curious 1s ease-in-out; }
+        #pixel-pet.eating { animation: pet-eating 0.8s steps(2, end) infinite; }
+        #pixel-pet.look_around { animation: pet-look-around 3s ease-in-out; }
+        #pixel-pet.scared { animation: pet-scared 0.5s ease-in-out infinite alternate; }
+
+        #pixel-pet.sleeping .pet-eye { height: 2px; top: 24px; }
+        #pixel-pet.sad .pet-eye { top: 26px; height: 6px; }
+        #pixel-pet.sad .pet-body { transform: scaleY(0.95); }
+        #pixel-pet.grumpy .pet-eye { height: 4px; border-radius: 0; }
+        #pixel-pet.grumpy .pet-eye.left { transform: rotate(-25deg); }
+        #pixel-pet.grumpy .pet-eye.right { transform: rotate(25deg); }
+        #pixel-pet.happy .pet-mouth, #pixel-pet.eating .pet-mouth { opacity: 1; }
+
+        @keyframes pet-idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes pet-happy { 0% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.1) rotate(10deg); } 100% { transform: translateY(0) scale(1) rotate(0deg); } }
+        @keyframes pet-curious { 0% { transform: rotate(0deg); } 30% { transform: rotate(-15deg); } 70% { transform: rotate(15deg); } 100% { transform: rotate(0deg); } }
+        @keyframes pet-eating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @keyframes pet-look-around { 0%, 100% { transform: translateX(0) scaleX(1); } 25% { transform: translateX(-5px) scaleX(1); } 50% { transform: translateX(-5px) scaleX(-1); } 75% { transform: translateX(5px) scaleX(-1); } 90% { transform: translateX(0) scaleX(1); } }
+        @keyframes pet-scared { 0% { transform: translateY(0) skewX(0); } 100% { transform: translateY(-2px) skewX(5deg); } }
+
+        @keyframes blink { 50% { opacity: 0; } }
+        .blinking-text { animation: blink 1.5s step-start infinite; }
+        .controls-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; margin-top: 24px; }
+        .d-pad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); justify-content: center; }
+        .d-pad-btn { border: 2px solid #222; cursor: pointer; user-select: none; }
+        .d-pad-btn:active { background-color: #555; filter: brightness(0.8); transform: translateY(1px); }
+        #btn-up { grid-column: 2; grid-row: 1; border-radius: 5px 5px 0 0; }
+        #btn-left { grid-column: 1; grid-row: 2; border-radius: 5px 0 0 5px; }
+        #btn-right { grid-column: 3; grid-row: 2; border-radius: 0 5px 5px 0; }
+        #btn-down { grid-column: 2; grid-row: 3; border-radius: 0 0 5px 5px; }
+        .center-piece { grid-column: 2; grid-row: 2; background-color: var(--dpad-color); cursor: pointer; }
+        .action-buttons { display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .action-btn { width: 70px; height: 70px; border-radius: 50%; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; user-select: none; }
+        .action-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+
+        /* Scroll Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="dynamic-bg"></div>
+    <canvas id="pixelRainCanvas"></canvas>
+    <div id="settings-icon">
+        <!-- SVG Icon changed to a plus sign -->
+        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+    </div>
+    
+    <!-- Modals -->
+    <div id="theme-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="text-2xl">[SELECT THEME]</h2><span id="close-theme-modal" class="close-modal">&times;</span></div><div id="theme-grid" class="theme-grid"></div></div></div>
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="text-2xl">[SETTINGS]</h2><span id="close-settings-modal" class="close-modal">&times;</span></div>
+            <div class="space-y-6">
+                <div>
+                    <label for="master-volume" class="block mb-2 text-sm">Master Volume</label>
+                    <input type="range" id="master-volume" min="0" max="1" step="0.01" class="w-full">
+                </div>
+
+                <div>
+                    <h3 class="text-lg mb-2">[PET CUSTOMIZATION]</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="pet-name-input" class="block mb-2 text-sm">Pet Name</label>
+                            <input type="text" id="pet-name-input" class="w-full p-2 text-sm" placeholder="Name your pet...">
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm">Pet Color</label>
+                            <div id="pet-color-palette" class="color-palette justify-start gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg mb-2">[STICKERS]</h3>
+                    <div id="sticker-grid"></div>
+                </div>
+
+                <div>
+                     <h3 class="text-lg mb-2 pt-4 border-t-2 border-dashed" style="border-color: var(--pixel-color);">[DANGER ZONE]</h3>
+                     <button id="reset-achievements-btn" class="social-btn reset-btn w-full">[RESET ALL PROGRESS]</button>
+                </div>
+
+                <button id="open-theme-modal-btn" class="social-btn px-4 py-2 text-sm w-full mt-4" style="display: none;">[SELECT THEME]</button>
+            </div>
+        </div>
+    </div>
+    <div id="reset-confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="text-2xl">[CONFIRM RESET]</h2></div>
+            <div class="space-y-4 text-center">
+                <p>Are you sure you want to reset all achievements and pet customizations? This cannot be undone.</p>
+                <div class="flex justify-center gap-4 mt-4">
+                    <button id="confirm-reset-btn" class="social-btn reset-btn px-4 py-2 text-sm">[YES, RESET]</button>
+                    <button id="cancel-reset-btn" class="social-btn px-4 py-2 text-sm">[CANCEL]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="sound-test-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="text-2xl">[SOUND TEST]</h2><span id="close-sound-test-modal" class="close-modal">&times;</span></div><div id="sound-test-grid" class="grid grid-cols-2 gap-4"></div></div></div>
+    <div id="pixel-art-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="text-2xl">[PIXEL ART]</h2><span id="close-pixel-art-modal" class="close-modal">&times;</span></div><div id="pixel-art-creator"></div></div></div>
+    <div id="chatbot-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl">[VERIDIAN-AI]</h2>
+                <span id="close-chatbot-modal" class="close-modal">&times;</span>
+            </div>
+            <div id="chatbot-screen"></div>
+            <div id="chatbot-input-container">
+                <span>></span>
+                <input type="text" id="chatbot-input" autocomplete="off">
+            </div>
+        </div>
+    </div>
+    <div id="time-travel-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl">[TIME TRAVEL]</h2>
+                <span id="close-time-travel-modal" class="close-modal">&times;</span>
+            </div>
+            <div id="time-travel-grid" class="grid grid-cols-1 gap-4"></div>
+        </div>
+    </div>
+    <div id="game-case-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl">[GAME CASE]</h2>
+                <span id="close-game-case-modal" class="close-modal">&times;</span>
+            </div>
+            <div id="game-cartridge-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Achievement Unlocked -->
+    <div id="achievement-unlocked">
+        <h3 class="text-lg">[ACHIEVEMENT UNLOCKED]</h3>
+        <p id="achievement-name" class="text-sm"></p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto p-4 max-w-4xl relative z-1">
+        <header class="text-center my-12">
+            <h1 id="main-header" class="text-4xl sm:text-5xl md:text-6xl tracking-widest header-main" style="text-shadow: 2px 2px #000;">VERIDIAN CITY STUDIOS</h1>
+            <p class="text-base sm:text-lg mt-2 header-sub" style="text-shadow: 1px 1px #000;">A retro gaming community memecoin</p>
+        </header>
+        <div class="gameboy-body mb-16 w-full max-w-sm sm:max-w-lg md:max-w-xl mx-auto">
+            <div id="sticker-container"></div>
+            <div id="news-ticker-container"><div id="news-ticker"></div></div>
+            <div class="gameboy-screen-container">
+                <div id="power-on-screen">
+                    <div id="power-on-logo">VERIDIAN</div>
+                </div>
+                <canvas id="gameCanvas"></canvas>
+            </div>
+            <div class="text-center my-4">
+                <a href="#" id="games-nav" class="text-sm py-2 px-4 interactive-sound">[GAME CASE]</a>
+            </div>
+            <div class="controls-container">
+                <div class="d-pad"><div id="btn-up" class="d-pad-btn"></div><div id="btn-left" class="d-pad-btn"></div><div id="d-pad-center" class="center-piece"></div><div id="btn-right" class="d-pad-btn"></div><div id="btn-down" class="d-pad-btn"></div></div>
+                <div class="action-buttons"><div id="btn-b" class="action-btn">B</div><div id="btn-a" class="action-btn">A</div></div>
+            </div>
+        </div>
+        <nav class="text-center mb-16"><ul class="flex flex-wrap justify-center space-x-4 md:space-x-8 text-lg"><li><a href="#features" class="hover:text-white interactive-sound">[FEATURES]</a></li><li><a href="#roadmap" class="hover:text-white interactive-sound">[ROADMAP]</a></li><li><a href="#team" class="hover:text-white interactive-sound">[PIONEERS]</a></li><li><a href="#achievements" class="hover:text-white interactive-sound">[ACHIEVEMENTS]</a></li><li id="time-travel-nav"><a href="#" class="hover:text-white interactive-sound">[TIME TRAVEL]</a></li><li><a href="#community" class="hover:text-white interactive-sound">[COMMUNITY]</a></li></ul></nav>
+        <section id="features" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[TOKEN FEATURES]</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="pixel-border-inset p-4 text-center"><img src="https://placehold.co/300x200/9bbc0f/0d2b1d?text=FOR+GAMERS" alt="For Gamers" class="w-full mb-4 pixel-border" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Image+Error';"><h3 class="text-xl mb-2">For Gamers</h3><p class="text-sm">The native currency of our upcoming retro gaming community.</p></div><div class="pixel-border-inset p-4 text-center"><img src="https://placehold.co/300x200/9bbc0f/0d2b1d?text=BY GAMERS" alt="BY GAMERS" class="w-full mb-4 pixel-border" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Image+Error';"><h3 class="text-xl mb-2">Decentralized</h3><p class="text-sm">Built by those who play, run by those who game.</p></div><div class="pixel-border-inset p-4 text-center"><img src="https://placehold.co/300x200/9bbc0f/0d2b1d?text=COMMUNITY" alt="Community" class="w-full mb-4 pixel-border" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Image+Error';"><h3 class="text-xl mb-2">Community</h3><p class="text-sm">Putting holders first, profit last.</p></div></div></section>
+        <section id="roadmap" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[ROADMAP]</h2><div class="pixel-border-inset p-6"><div class="roadmap-container"><div class="roadmap-node completed"><div class="node-icon"></div><p class="node-text">Q3 2025: TOKEN LAUNCH</p></div><div class="roadmap-connector"></div><div class="roadmap-node completed"><div class="node-icon"></div><p class="node-text">Q3 2025: Merch and Branding</p></div><div class="roadmap-connector"></div><div class="roadmap-node"><div class="node-icon"></div><p class="node-text">Q4 2025: International Tournaments</p></div><div class="roadmap-connector"></div><div class="roadmap-node"><div class="node-icon"></div><p class="node-text">Q1 2026: FIRST GAME FUNDED</p></div></div></div></section>
+        <section id="team" class="mb-16 fade-in-section">
+            <h2 id="pioneers-header" class="text-3xl text-center mb-8 header-main">[VERIDIAN PIONEERS]</h2>
+            <div id="pokedex-container">
+                <div class="pokedex-left">
+                    <div class="pokedex-lights">
+                        <div class="pokedex-light red"></div>
+                        <div class="pokedex-light yellow"></div>
+                        <div class="pokedex-light green"></div>
+                    </div>
+                    <div class="pokedex-avatar-container">
+                        <img id="pioneer-avatar" src="" alt="Team Member Avatar" onerror="this.onerror=null;this.src='https://placehold.co/150x150/cccccc/333333?text=Avatar+Error';">
+                    </div>
+                    <div class="pokedex-nav">
+                        <button id="pokedex-prev" class="pokedex-nav-btn">&lt;</button>
+                        <button id="pokedex-next" class="pokedex-nav-btn">&gt;</button>
+                    </div>
+                </div>
+                <div class="pokedex-right">
+                    <h3 id="pioneer-name"></h3>
+                    <h4 id="pioneer-title"></h4>
+                    <p id="pioneer-bio"></p>
+                </div>
+            </div>
+        </section>
+        <section id="achievements" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[ACHIEVEMENTS]</h2><div id="achievements-list" class="pixel-border-inset p-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div></section>
+        <section id="community" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[JOIN THE COMMUNITY]</h2><div class="pixel-border-inset p-6"><div class="flex flex-col items-center space-y-6"><p class="text-center">Follow our progress and chat with the team on our social channels.</p><a href="https://x.com/veridiancity" target="_blank" class="w-full max-w-sm text-center social-btn py-3 text-lg pixel-border interactive-sound">X / TWITTER</a><a href="https://t.me/veridiancity" target="_blank" class="w-full max-w-sm text-center social-btn py-3 text-lg pixel-border interactive-sound">TELEGRAM</a><a href="#" target="_blank" class="w-full max-w-sm text-center social-btn py-3 text-lg pixel-border interactive-sound">DISCORD</a></div></div></section>
+        <footer class="text-center pt-8"><p id="footer-text" class="blinking-text cursor-pointer">© 2025 VERIDIAN CITY STUDIOS</p></footer>
+    </div>
+    <div id="pixel-pet-container">
+        <div id="pixel-pet">
+            <div id="pet-thought-bubble">?</div>
+            <div class="pet-body"></div>
+            <div class="pet-eye left"></div>
+            <div class="pet-eye right"></div>
+            <div class="pet-mouth"></div>
+        </div>
+    </div>
+    <div id="chatbot-toggle">
+        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.083-3.083A7.002 7.002 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.417 11.583A5.002 5.002 0 006 15c3.314 0 6-2.686 6-6s-2.686-6-6-6a5.996 5.996 0 00-4.417 1.917L2 6h12a1 1 0 010 2H4.417z" clip-rule="evenodd"></path></svg>
+    </div>
+
+    <script>
+        // --- INTERACTIVITY SCRIPT ---
+        
+        // --- Sound Engine (Tone.js) ---
+        let soundsReady = false;
+        
+        // Synths for sound effects
+        const clickSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 } }).toDestination();
+        const confirmSynth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
+        const powerUpSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 } }).toDestination();
+        const gameOverSynth = new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0, release: 0.1 } }).toDestination();
+        const pauseSynth = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.001, decay: 0.05, sustain: 0.1, release: 0.2 } }).toDestination();
+        const feedSynth = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.05, sustain: 0 } }).toDestination();
+        const sadSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.1, release: 0.5 } }).toDestination();
+        const shootSynth = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.001, decay: 0.05, sustain: 0.01, release: 0.1 }, volume: -10 }).toDestination();
+        const explosionSynth = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -5 }).toDestination();
+        const powerOnSynth = new Tone.Synth({ oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
+        
+        function playBeep() { if (soundsReady) clickSynth.triggerAttackRelease('C4', '8n'); }
+        function playConfirm() { if (soundsReady) { const now = Tone.now(); confirmSynth.triggerAttackRelease(['G4', 'C5'], '8n', now); } }
+        function playPowerUp() { if (soundsReady) powerUpSynth.triggerAttackRelease('E5', '16n'); }
+        function playGameOver() { if (soundsReady) gameOverSynth.triggerAttackRelease('C3', '4n'); }
+        function playPause() { if (soundsReady) pauseSynth.triggerAttackRelease('A4', '16n'); }
+        function playFeed() { if (soundsReady) feedSynth.triggerAttackRelease("8n"); }
+        function playSad() { if (soundsReady) sadSynth.triggerAttackRelease('D3', '2n'); }
+        function playShoot() { if(soundsReady) shootSynth.triggerAttackRelease('C6', '16n'); }
+        function playExplosion() { if(soundsReady) explosionSynth.triggerAttackRelease('8n'); }
+        function playPowerOn() { if(soundsReady) powerOnSynth.triggerAttackRelease('C2', '8n'); }
+        
+        document.body.addEventListener('click', async () => {
+            if (!soundsReady) {
+                await Tone.start();
+                soundsReady = true;
+                document.getElementById('settings-icon').querySelector('svg').style.color = getThemeColor('--header-color');
+            }
+        }, { once: true });
+        document.querySelectorAll('.interactive-sound, .d-pad-btn, .action-btn').forEach(btn => btn.addEventListener('mousedown', playBeep));
+
+        // --- EASTER EGGS & MODALS ---
+        const konamiCode = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
+        let konamiCodeSequence = [];
+        const themes = [
+            { name: 'Default', className: '' }, 
+            { name: 'Pocket', className: 'theme-pocket' }, 
+            { name: 'Light', className: 'theme-light' }, 
+            { name: 'Virtual', className: 'theme-virtual' }, 
+            { name: 'Blue', className: 'theme-blue' }, 
+            { name: 'Grape', className: 'theme-grape' }, 
+            { name: 'Kiwi', className: 'theme-kiwi' }, 
+            { name: 'Atomic', className: 'theme-atomic' }, 
+            { name: 'Berry', className: 'theme-berry' }, 
+            { name: 'Jungle', className: 'theme-jungle' },
+            { name: 'Sunset', className: 'theme-sunset' },
+            { name: 'Ocean', className: 'theme-ocean' },
+            { name: 'Forest', className: 'theme-forest' },
+            { name: 'Vaporwave', className: 'theme-vaporwave' },
+            { name: 'Amber', className: 'theme-amber' },
+            { name: 'Miami', className: 'theme-miami' },
+            { name: 'Arcade', className: 'theme-arcade' },
+            { name: 'Blueprint', className: 'theme-blueprint' },
+            { name: 'Sakura', className: 'theme-sakura' }
+        ];
+
+        const themeModal = document.getElementById('theme-modal');
+        const closeThemeModal = document.getElementById('close-theme-modal');
+        const themeGrid = document.getElementById('theme-grid');
+        
+        function populateThemeModal() {
+            themeGrid.innerHTML = '';
+            themes.forEach(theme => {
+                const swatch = document.createElement('div');
+                swatch.className = 'theme-swatch';
+                
+                // Temporarily apply the theme class to get the computed colors
+                const tempDiv = document.createElement('div');
+                tempDiv.style.display = 'none';
+                tempDiv.className = theme.className;
+                document.body.appendChild(tempDiv);
+                const style = getComputedStyle(tempDiv);
+                const gbColor = style.getPropertyValue('--gb-body-color');
+                const screenBorder = style.getPropertyValue('--screen-border');
+                const screenBg = style.getPropertyValue('--screen-bg');
+                const dpadColor = style.getPropertyValue('--dpad-color');
+                const buttonColor = style.getPropertyValue('--button-color');
+                const modalTextColor = style.getPropertyValue('--modal-text-color');
+                document.body.removeChild(tempDiv);
+
+                const themeDisplayName = theme.name.charAt(0).toUpperCase() + theme.name.slice(1);
+
+                swatch.innerHTML = `
+                    <div class="mini-gameboy" style="--gb-body-color: ${gbColor}; --gb-body-shadow1: #0002; --gb-body-shadow2: #fff2;">
+                        <div class="mini-screen-container" style="--screen-border: ${screenBorder};">
+                            <div class="mini-screen" style="--screen-bg: ${screenBg};"></div>
+                        </div>
+                        <div class="mini-controls">
+                            <div class="mini-dpad" style="--dpad-color: ${dpadColor};"></div>
+                            <div class="mini-buttons">
+                                <div class="mini-button" style="--button-color: ${buttonColor};"></div>
+                                <div class="mini-button" style="--button-color: ${buttonColor};"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="theme-label text-center text-sm mt-2" style="color: ${modalTextColor}; text-shadow: 1px 1px #00000050;">${themeDisplayName}</div>
+                `;
+                swatch.onclick = () => {
+                    document.body.className = theme.className;
+                    localStorage.setItem('veridianTheme', theme.className); // Save theme
+                    updateDynamicBackground();
+                    playConfirm();
+                    pet.set_state('happy', 500);
+                    document.getElementById('settings-icon').querySelector('svg').style.color = getThemeColor('--header-color');
+                    resizeCanvas();
+                    themeModal.style.display = 'none';
+                };
+                themeGrid.appendChild(swatch);
+            });
+        }
+        
+        /**
+         * Checks if the entered key is part of the Konami code sequence.
+         * This new implementation correctly tracks the sequence and resets if a wrong key is pressed.
+         * @param {string} key The key that was pressed.
+         * @returns {number} 0 for no match, 1 for a partial match, 2 for a full match.
+         */
+        function checkCode(key) {
+            const lowerKey = key.toLowerCase();
+
+            // Check if the current key is the next one in the sequence
+            if (konamiCode[konamiCodeSequence.length] === lowerKey) {
+                konamiCodeSequence.push(lowerKey);
+            } else {
+                // If the key is wrong, reset the sequence.
+                // But if the wrong key is the first key of the code, start a new sequence.
+                konamiCodeSequence = (konamiCode[0] === lowerKey) ? [lowerKey] : [];
+            }
+
+            // Check for full match
+            if (konamiCodeSequence.length === konamiCode.length) {
+                konamiCodeSequence = []; // Reset for the next attempt
+                return 2; // Full match
+            }
+            
+            // Check for partial match
+            if (konamiCodeSequence.length > 0) {
+                return 1; // Partial match
+            }
+
+            return 0; // No match
+        }
+
+        closeThemeModal.onclick = () => { themeModal.style.display = 'none'; };
+        
+        let headerClicks = 0;
+        document.getElementById('main-header').addEventListener('click', () => { if (++headerClicks === 10) { headerClicks = 0; triggerPixelRain(); } });
+        const rainCanvas = document.getElementById('pixelRainCanvas'), rainCtx = rainCanvas.getContext('2d');
+        let rainAnimation;
+        function triggerPixelRain() {
+            unlockAchievement('matrixMode');
+            pet.set_state('scared'); // Pet gets scared by the rain
+            rainCanvas.style.display = 'block';
+            rainCanvas.width = window.innerWidth;
+            rainCanvas.height = window.innerHeight;
+            const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const fontSize = 16, columns = rainCanvas.width / fontSize;
+            const rainDrops = Array.from({ length: columns }).map(() => 1);
+            const drawRain = () => {
+                rainCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                rainCtx.fillRect(0, 0, rainCanvas.width, rainCanvas.height);
+                rainCtx.fillStyle = getThemeColor('--header-color');
+                rainCtx.font = fontSize + 'px monospace';
+                rainDrops.forEach((y, ind) => {
+                    rainCtx.fillText(alphabet.charAt(Math.floor(Math.random() * alphabet.length)), ind * fontSize, y * fontSize);
+                    if (y * fontSize > rainCanvas.height && Math.random() > 0.975) rainDrops[ind] = 0;
+                    rainDrops[ind]++;
+                });
+            };
+            if(rainAnimation) clearInterval(rainAnimation);
+            rainAnimation = setInterval(drawRain, 33);
+            setTimeout(() => { 
+                clearInterval(rainAnimation); 
+                rainCanvas.style.display = 'none';
+                pet.set_state('idle'); // Pet calms down
+            }, 5000);
+        }
+        const footerText = document.getElementById('footer-text'), originalFooterText = footerText.textContent;
+        const secretMessages = ["ALL YOUR BASE ARE BELONG TO US", "IT'S DANGEROUS TO GO ALONE!", "THE CAKE IS A LIE.", "DO A BARREL ROLL!", "A WINNER IS YOU"];
+        footerText.addEventListener('click', () => { 
+            unlockAchievement('wiseWords');
+            footerText.textContent = secretMessages[Math.floor(Math.random() * secretMessages.length)]; 
+            setTimeout(() => { footerText.textContent = originalFooterText; }, 2000); 
+        });
+
+        // --- Achievement System ---
+        const achievements = {
+            konamiMaster: { name: "Konami Master", desc: "Entered the secret code.", unlocked: false, icon: '🎮' },
+            matrixMode: { name: "Matrix Mode", desc: "Entered the digital rain.", unlocked: false, icon: '💧' },
+            wiseWords: { name: "Wise Words", desc: "Found a secret message.", unlocked: false, icon: '📜' },
+            snakeCharmer: { name: "Snake Charmer", desc: "Scored 50 points in Snake.", unlocked: false, icon: '🐍' },
+            galaxyDefender: { name: "Galaxy Defender", desc: "Score 1000 points in Pixel Invaders.", unlocked: false, icon: '👾' },
+            pixelArtist: { name: "Pixel Artist", desc: "Discovered the art studio.", unlocked: false, icon: '🎨' },
+            settingsGuru: { name: "Settings Guru", desc: "Opened the settings menu.", unlocked: false, icon: '⚙️' },
+            systemShock: { name: "System Shock", desc: "Talked to the machine.", unlocked: false, icon: '🤖' },
+            timeTraveler: { name: "Time Traveler", desc: "Bent the rules of time.", unlocked: false, icon: '⏳' },
+            cartridgeCollector: { name: "Cartridge Collector", desc: "Selected a game to play.", unlocked: false, icon: '💾' },
+            madeAFriend: { name: "Made a Friend", desc: "Played with the pixel pet.", unlocked: false, icon: '❤️' },
+            highScoreAchiever: { name: "Record Breaker", desc: "Set a new high score.", unlocked: false, icon: '🏆' }
+        };
+        const achievementPopup = document.getElementById('achievement-unlocked');
+        const achievementName = document.getElementById('achievement-name');
+        const achievementsList = document.getElementById('achievements-list');
+
+        function unlockAchievement(id) {
+            if (achievements[id] && !achievements[id].unlocked) {
+                achievements[id].unlocked = true;
+                achievementName.textContent = achievements[id].name;
+                achievementPopup.classList.add('show');
+                playConfirm();
+                renderAchievements();
+                populateStickerGrid();
+                
+                localStorage.setItem('unlockedAchievements', JSON.stringify(achievements));
+                setTimeout(() => {
+                    achievementPopup.classList.remove('show');
+                }, 3000);
+            }
+        }
+        function renderAchievements() {
+            achievementsList.innerHTML = '';
+            for (const id in achievements) {
+                const ach = achievements[id];
+                const achDiv = document.createElement('div');
+                achDiv.className = 'achievement-item p-2';
+                if (ach.unlocked) {
+                    achDiv.classList.add('unlocked');
+                    achDiv.innerHTML = `<h4 class="font-bold">${ach.icon} ${ach.name}</h4><p class="text-xs">${ach.desc}</p>`;
+                } else {
+                    achDiv.innerHTML = `<h4 class="font-bold">[LOCKED]</h4><p class="text-xs">??????????</p>`;
+                }
+                achievementsList.appendChild(achDiv);
+            }
+        }
+        function loadAchievements() {
+            const saved = JSON.parse(localStorage.getItem('unlockedAchievements'));
+            if (saved) {
+                for (const id in saved) {
+                    if (achievements[id] && saved[id].unlocked) {
+                        achievements[id].unlocked = true;
+                        if (id === 'konamiMaster') {
+                            document.getElementById('open-theme-modal-btn').style.display = 'block';
+                        }
+                    }
+                }
+            }
+            renderAchievements();
+        }
+        
+        // --- Sound Test Modal ---
+        const soundTestModal = document.getElementById('sound-test-modal');
+        let dPadCenterClicks = 0;
+        document.getElementById('d-pad-center').addEventListener('click', () => {
+            if (++dPadCenterClicks === 5) {
+                dPadCenterClicks = 0;
+                unlockAchievement('soundEngineer');
+                const soundGrid = document.getElementById('sound-test-grid');
+                soundGrid.innerHTML = '';
+                const sounds = { 'BEEP': playBeep, 'CONFIRM': playConfirm, 'POWER UP': playPowerUp, 'GAME OVER': playGameOver, 'PAUSE': playPause, 'FEED': playFeed, 'SAD': playSad, 'SHOOT': playShoot, 'EXPLODE': playExplosion };
+                for (const name in sounds) {
+                    const btn = document.createElement('button');
+                    btn.className = 'social-btn py-2';
+                    btn.onclick = sounds[name];
+                    soundGrid.appendChild(btn);
+                }
+                soundTestModal.style.display = 'flex';
+            }
+        });
+        document.getElementById('close-sound-test-modal').onclick = () => { soundTestModal.style.display = 'none'; };
+        
+        // --- Pixel Art Creator ---
+        const pixelArtModal = document.getElementById('pixel-art-modal');
+        const pixelArtCreator = document.getElementById('pixel-art-creator');
+        const closePixelArtModal = document.getElementById('close-pixel-art-modal');
+        let pioneerHeaderClicks = 0;
+
+        document.getElementById('pioneers-header').addEventListener('click', () => {
+            pioneerHeaderClicks++;
+            if (pioneerHeaderClicks === 5) {
+                pioneerHeaderClicks = 0; // Reset counter
+                unlockAchievement('pixelArtist');
+                initializePixelArtCreator();
+                pixelArtModal.style.display = 'flex';
+            }
+            setTimeout(() => { pioneerHeaderClicks = 0; }, 2000); // Reset after 2 seconds
+        });
+
+        function initializePixelArtCreator() {
+            pixelArtCreator.innerHTML = ''; // Clear previous content
+            
+            const GRID_SIZE = 16;
+            const PIXEL_SCALE = 20;
+            let isDrawing = false;
+            let currentTool = 'draw'; // 'draw', 'erase', 'fill', 'stamp'
+            let selectedColor = getThemeColor('--pixel-color');
+            let selectedStamp = null;
+
+            // --- Data for Tools ---
+            const stamps = {
+                heart: {
+                    name: 'Heart',
+                    width: 5,
+                    data: [0,1,1,0,0,1,1,1,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,0]
+                },
+                star: {
+                    name: 'Star',
+                    width: 5,
+                    data: [0,0,1,0,0,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,0,1,0,1,0]
+                },
+                coin: {
+                    name: 'Coin',
+                    width: 4,
+                    data: [0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0]
+                },
+                pet: {
+                    name: 'Pet',
+                    width: 5,
+                    data: [0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1,0,0,0,0,0,0]
+                }
+            };
+            
+            // --- UI Creation ---
+            const toolsContainer = document.createElement('div');
+            toolsContainer.id = 'pixel-art-tools';
+
+            const paletteContainer = document.createElement('div');
+            paletteContainer.className = 'color-palette';
+            
+            const controlsContainer = document.createElement('div');
+            controlsContainer.id = 'pixel-art-controls';
+
+            const gridContainer = document.createElement('div');
+            gridContainer.id = 'pixel-art-grid';
+
+            // --- Tool Buttons ---
+            const createToolButton = (toolName, iconSvg, title) => {
+                const button = document.createElement('button');
+                button.className = 'tool-btn';
+                button.title = title;
+                button.innerHTML = `<svg class="tool-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">${iconSvg}</svg>`;
+                button.onclick = () => {
+                    toolsContainer.querySelector('.selected')?.classList.remove('selected');
+                    paletteContainer.querySelector('.selected')?.classList.remove('selected');
+                    button.classList.add('selected');
+                    currentTool = toolName;
+                };
+                return button;
+            };
+
+            const pencilTool = createToolButton('draw', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" />`, "Pencil");
+            const eraserTool = createToolButton('erase', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />`, "Eraser");
+            const fillTool = createToolButton('fill', `<path fill="currentColor" d="M2,2 L2,22 L22,22 L22,2 Z M4,4 L20,4 L20,20 L4,20 Z" /><path fill="currentColor" d="M11.5,12.5 L22,2" stroke="currentColor" stroke-width="2" />`, "Fill");
+            
+            toolsContainer.appendChild(pencilTool);
+            toolsContainer.appendChild(eraserTool);
+            toolsContainer.appendChild(fillTool);
+
+            // --- Palette ---
+            const paletteColors = [
+                getThemeColor('--screen-text'), getThemeColor('--pixel-color'), getThemeColor('--header-color'),
+                getThemeColor('--header-sub-color'), getThemeColor('--button-color'), '#FFFFFF', '#C0C0C0', '#808080', '#000000',
+                '#FF0000', '#800000', '#FFA500', '#A52A2A', '#FFFF00', '#808000', '#00FF00', '#008000',
+                '#00FFFF', '#008080', '#0000FF', '#000080', '#FF00FF', '#800080'
+            ];
+            paletteColors.forEach((color, index) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'palette-color';
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+                if (index === 0) {
+                    swatch.classList.add('selected');
+                    selectedColor = color;
+                    pencilTool.classList.add('selected');
+                }
+                swatch.addEventListener('click', () => {
+                    paletteContainer.querySelector('.selected')?.classList.remove('selected');
+                    toolsContainer.querySelector('.selected')?.classList.remove('selected');
+                    swatch.classList.add('selected');
+                    pencilTool.classList.add('selected');
+                    selectedColor = color;
+                    currentTool = 'draw';
+                });
+                paletteContainer.appendChild(swatch);
+            });
+            
+            // --- Stamps ---
+            for(const stampId in stamps) {
+                const stamp = stamps[stampId];
+                const stampButton = createToolButton('stamp', `<path d="M5 3v4M3 5h4M15 3v4M13 5h4M5 15v4M3 17h4M15 15v4M13 17h4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`, stamp.name); // Placeholder
+                stampButton.onclick = () => {
+                    toolsContainer.querySelector('.selected')?.classList.remove('selected');
+                    paletteContainer.querySelector('.selected')?.classList.remove('selected');
+                    stampButton.classList.add('selected');
+                    currentTool = 'stamp';
+                    selectedStamp = stamp;
+                };
+                toolsContainer.appendChild(stampButton);
+            }
+
+            // --- Grid ---
+            let gridData = Array(GRID_SIZE * GRID_SIZE).fill(getThemeColor('--screen-bg'));
+            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'pixel-cell';
+                cell.dataset.index = i;
+                cell.style.backgroundColor = gridData[i];
+                gridContainer.appendChild(cell);
+            }
+
+            const drawPixel = (index) => {
+                if(index < 0 || index >= gridData.length) return;
+                gridData[index] = selectedColor;
+                gridContainer.children[index].style.backgroundColor = selectedColor;
+            };
+
+            const erasePixel = (index) => {
+                 if(index < 0 || index >= gridData.length) return;
+                gridData[index] = getThemeColor('--screen-bg');
+                gridContainer.children[index].style.backgroundColor = getThemeColor('--screen-bg');
+            }
+
+            const floodFill = (startIndex, targetColor, replacementColor) => {
+                if (targetColor === replacementColor) return;
+                const queue = [startIndex];
+                const processed = new Set([startIndex]);
+                
+                while(queue.length > 0) {
+                    const currentIndex = queue.shift();
+                    gridData[currentIndex] = replacementColor;
+                    gridContainer.children[currentIndex].style.backgroundColor = replacementColor;
+
+                    const x = currentIndex % GRID_SIZE;
+                    const y = Math.floor(currentIndex / GRID_SIZE);
+
+                    [[x, y - 1], [x, y + 1], [x - 1, y], [x + 1, y]].forEach(([nx, ny]) => {
+                        if (nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
+                            const neighborIndex = ny * GRID_SIZE + nx;
+                            if (!processed.has(neighborIndex) && gridData[neighborIndex] === targetColor) {
+                                processed.add(neighborIndex);
+                                queue.push(neighborIndex);
+                            }
+                        }
+                    });
+                }
+            };
+            
+            const applyStamp = (startIndex) => {
+                if (!selectedStamp) return;
+                const startX = startIndex % GRID_SIZE;
+                const startY = Math.floor(startIndex / GRID_SIZE);
+
+                for(let i=0; i<selectedStamp.data.length; i++) {
+                    if(selectedStamp.data[i] === 1) {
+                        const x = startX + (i % selectedStamp.width);
+                        const y = startY + Math.floor(i / selectedStamp.width);
+                        if (x < GRID_SIZE && y < GRID_SIZE) {
+                            const index = y * GRID_SIZE + x;
+                            drawPixel(index);
+                        }
+                    }
+                }
+            };
+
+            const handleDraw = (e) => {
+                e.preventDefault();
+                const rect = gridContainer.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                const col = Math.floor(x / (rect.width / GRID_SIZE));
+                const row = Math.floor(y / (rect.height / GRID_SIZE));
+                const index = row * GRID_SIZE + col;
+                
+                if (index >= 0 && index < GRID_SIZE * GRID_SIZE) {
+                    if(currentTool === 'draw') drawPixel(index);
+                    if(currentTool === 'erase') erasePixel(index);
+                }
+            };
+            
+            const handleStart = (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                const rect = gridContainer.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                const col = Math.floor(x / (rect.width / GRID_SIZE));
+                const row = Math.floor(y / (rect.height / GRID_SIZE));
+                const index = row * GRID_SIZE + col;
+
+                if (index >= 0 && index < GRID_SIZE * GRID_SIZE) {
+                    if(currentTool === 'fill') floodFill(index, gridData[index], selectedColor);
+                    else if(currentTool === 'stamp') applyStamp(index);
+                    else handleDraw(e);
+                }
+            };
+
+            gridContainer.addEventListener('mousedown', handleStart);
+            gridContainer.addEventListener('mousemove', (e) => {
+                if (isDrawing) handleDraw(e);
+            });
+            gridContainer.addEventListener('touchstart', handleStart, { passive: false });
+            gridContainer.addEventListener('touchmove', (e) => {
+                if (isDrawing) handleDraw(e);
+            }, { passive: false });
+            
+            document.body.addEventListener('mouseup', () => { isDrawing = false; });
+            document.body.addEventListener('touchend', () => { isDrawing = false; });
+            gridContainer.addEventListener('mouseleave', () => { isDrawing = false; });
+
+            // --- Bottom Controls ---
+            const clearButton = document.createElement('button');
+            clearButton.textContent = '[CLEAR]';
+            clearButton.className = 'social-btn text-sm px-3 py-1';
+            clearButton.onclick = () => {
+                gridData.fill(getThemeColor('--screen-bg'));
+                gridContainer.querySelectorAll('.pixel-cell').forEach((cell, i) => {
+                    cell.style.backgroundColor = gridData[i];
+                });
+            };
+
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = '[DOWNLOAD]';
+            downloadButton.className = 'social-btn text-sm px-3 py-1';
+            downloadButton.onclick = () => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = GRID_SIZE * PIXEL_SCALE;
+                tempCanvas.height = GRID_SIZE * PIXEL_SCALE;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                for(let i = 0; i < gridData.length; i++) {
+                    const x = (i % GRID_SIZE) * PIXEL_SCALE;
+                    const y = Math.floor(i / GRID_SIZE) * PIXEL_SCALE;
+                    tempCtx.fillStyle = gridData[i];
+                    tempCtx.fillRect(x, y, PIXEL_SCALE, PIXEL_SCALE);
+                }
+
+                const link = document.createElement('a');
+                link.download = 'veridian-pixel-art.png';
+                link.href = tempCanvas.toDataURL('image/png');
+                link.click();
+            };
+
+            controlsContainer.appendChild(clearButton);
+            controlsContainer.appendChild(downloadButton);
+
+            pixelArtCreator.appendChild(toolsContainer);
+            pixelArtCreator.appendChild(paletteContainer);
+            pixelArtCreator.appendChild(gridContainer);
+            pixelArtCreator.appendChild(controlsContainer);
+        }
+
+        closePixelArtModal.onclick = () => { pixelArtModal.style.display = 'none'; };
+
+
+        // --- Settings Modal & Music ---
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettingsModal = document.getElementById('close-settings-modal');
+        const petNameInput = document.getElementById('pet-name-input');
+        const petColorPalette = document.getElementById('pet-color-palette');
+        const resetAchievementsBtn = document.getElementById('reset-achievements-btn');
+        const resetConfirmModal = document.getElementById('reset-confirm-modal');
+        const confirmResetBtn = document.getElementById('confirm-reset-btn');
+        const cancelResetBtn = document.getElementById('cancel-reset-btn');
+
+
+        function initializePetCustomization() {
+            // Pet Name
+            petNameInput.addEventListener('input', (e) => {
+                localStorage.setItem('veridianPetName', e.target.value);
+            });
+
+            // Pet Colors
+            const petColors = ['#76b876', '#ff80ab', '#7FDBFF', '#FFBF00', '#9d4edd', '#fefae0', '#ff8c42', '#00f0ff'];
+            petColorPalette.innerHTML = '';
+            petColors.forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'palette-color';
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+                swatch.addEventListener('click', () => {
+                    localStorage.setItem('veridianPetColor', color);
+                    document.documentElement.style.setProperty('--pet-body-color', color);
+                    pet.set_state('happy', 500);
+                    
+                    petColorPalette.querySelector('.selected')?.classList.remove('selected');
+                    swatch.classList.add('selected');
+                });
+                petColorPalette.appendChild(swatch);
+            });
+
+            loadPetCustomizations();
+        }
+
+        function loadPetCustomizations() {
+            // Load Name
+            const savedName = localStorage.getItem('veridianPetName');
+            if (savedName) {
+                petNameInput.value = savedName;
+            }
+
+            // Load Color
+            const savedColor = localStorage.getItem('veridianPetColor');
+            if (savedColor) {
+                document.documentElement.style.setProperty('--pet-body-color', savedColor);
+                 petColorPalette.querySelector('.selected')?.classList.remove('selected');
+                const currentSwatch = petColorPalette.querySelector(`[data-color="${savedColor}"]`);
+                if(currentSwatch) currentSwatch.classList.add('selected');
+            } else {
+                // Select the default color swatch
+                 petColorPalette.querySelector('.selected')?.classList.remove('selected');
+                const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--pet-body-color').trim();
+                const defaultSwatch = petColorPalette.querySelector(`[data-color="${defaultColor}"]`);
+                if(defaultSwatch) defaultSwatch.classList.add('selected');
+            }
+        }
+        
+        function setupResetListeners() {
+            resetAchievementsBtn.addEventListener('click', () => {
+                resetConfirmModal.style.display = 'flex';
+            });
+
+            cancelResetBtn.addEventListener('click', () => {
+                resetConfirmModal.style.display = 'none';
+            });
+
+            confirmResetBtn.addEventListener('click', () => {
+                // Reset achievements
+                localStorage.removeItem('unlockedAchievements');
+                for (const id in achievements) {
+                    achievements[id].unlocked = false;
+                }
+                renderAchievements();
+                document.getElementById('open-theme-modal-btn').style.display = 'none';
+
+                // Reset pet
+                localStorage.removeItem('veridianPetName');
+                localStorage.removeItem('veridianPetColor');
+                petNameInput.value = '';
+                document.documentElement.style.setProperty('--pet-body-color', ''); // Reset to default from CSS
+                
+                // Reset Stickers
+                localStorage.removeItem('veridianStickers');
+                document.getElementById('sticker-container').innerHTML = '';
+
+                loadPetCustomizations(); 
+                populateStickerGrid();
+
+                playGameOver();
+                resetConfirmModal.style.display = 'none';
+                settingsModal.style.display = 'none';
+            });
+        }
+
+
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                 settingsModal.style.display = 'none';
+            }
+        });
+        closeSettingsModal.onclick = () => {
+            settingsModal.style.display = 'none';
+        };
+        document.getElementById('settings-icon').addEventListener('click', () => {
+            unlockAchievement('settingsGuru');
+            populateStickerGrid(); // Refresh sticker grid when opening settings
+            settingsModal.style.display = 'flex';
+        });
+
+        document.getElementById('master-volume').addEventListener('input', (e) => {
+            const volume = parseFloat(e.target.value);
+            Tone.getDestination().volume.value = Tone.gainToDb(volume * 2); 
+            localStorage.setItem('veridianMasterVolume', volume);
+        });
+        
+        document.getElementById('open-theme-modal-btn').addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+            populateThemeModal();
+            themeModal.style.display = 'flex';
+        });
+
+
+        // --- Time Travel ---
+        const timeTravelModal = document.getElementById('time-travel-modal');
+        const timeTravelGrid = document.getElementById('time-travel-grid');
+        const eras = [
+            { name: 'Default (Game Boy)', className: '' },
+            { name: '1985 (CGA Era)', className: 'era-1985' },
+            { name: '1995 (3D-Button Era)', className: 'era-1995' }
+        ];
+
+        function populateTimeTravelModal() {
+            timeTravelGrid.innerHTML = '';
+            eras.forEach(era => {
+                const btn = document.createElement('button');
+                btn.textContent = `[${era.name}]`;
+                btn.className = 'social-btn py-3 text-lg';
+                btn.onclick = () => {
+                    unlockAchievement('timeTraveler');
+                    // Remove other era classes before adding the new one
+                    document.body.classList.remove('era-1985', 'era-1995');
+                    if (era.className) {
+                        document.body.classList.add(era.className);
+                    }
+                    playConfirm();
+                    timeTravelModal.style.display = 'none';
+                };
+                timeTravelGrid.appendChild(btn);
+            });
+        }
+
+        document.getElementById('time-travel-nav').addEventListener('click', (e) => {
+            e.preventDefault();
+            populateTimeTravelModal();
+            timeTravelModal.style.display = 'flex';
+        });
+        document.getElementById('close-time-travel-modal').onclick = () => {
+            timeTravelModal.style.display = 'none';
+        };
+
+
+        // --- ENHANCED PIXEL PET SCRIPT ---
+        const pet = {
+            el: document.getElementById('pixel-pet'),
+            container: document.getElementById('pixel-pet-container'),
+            thoughtBubble: document.getElementById('pet-thought-bubble'),
+            state: 'idle',
+            isInteractive: true,
+            state_timeout: null,
+            lifecycle_interval: null,
+            hints: [
+                "Try the Konami code...",
+                "The header seems clickable...",
+                "What does the footer say?",
+                "The D-pad center might do something...",
+                "Maybe the chatbot knows a secret?",
+                "Click the Pioneers header 5 times..."
+            ],
+
+            set_state: function(newState, duration = 0) {
+                if (!this.isInteractive && newState !== 'idle' && newState !== this.state) return;
+
+                clearTimeout(this.state_timeout);
+                this.el.className = 'idle happy curious eating look_around scared sleeping sad grumpy'.split(' ').reduce((cn, cl) => cn.replace(cl, ''), this.el.className);
+                
+                this.state = newState;
+                this.el.classList.add(this.state);
+
+                if (newState !== 'thinking') {
+                    this.hide_thought_bubble();
+                }
+
+                if (duration > 0) {
+                    this.isInteractive = false;
+                    this.state_timeout = setTimeout(() => {
+                        this.isInteractive = true;
+                        this.set_state('idle');
+                    }, duration);
+                }
+            },
+
+            show_thought_bubble: function(content) {
+                this.thoughtBubble.innerHTML = content;
+                this.thoughtBubble.classList.add('show');
+                this.set_state('curious', 4000); // Pet looks curious while giving a hint
+                setTimeout(() => {
+                    this.hide_thought_bubble();
+                }, 4000);
+            },
+
+            hide_thought_bubble: function() {
+                this.thoughtBubble.classList.remove('show');
+            },
+            
+            lifecycle: function() {
+                if (this.isInteractive) {
+                    const rand = Math.random();
+                    const states = ['look_around', 'curious', 'happy', 'idle', 'idle']; // Skew towards idle
+                    if (rand < 0.1) { // 10% chance to show a hint
+                        const hint = this.hints[Math.floor(Math.random() * this.hints.length)];
+                        this.show_thought_bubble(hint);
+                    } else if (rand < 0.6) { // 50% chance for another animation
+                        const randomState = states[Math.floor(Math.random() * states.length)];
+                        this.set_state(randomState, 3000);
+                    }
+                    // Otherwise, it stays in the default idle animation
+                }
+            },
+
+            init: function() {
+                this.set_state('idle');
+                this.lifecycle_interval = setInterval(() => this.lifecycle(), 7000); // Check every 7 seconds
+
+                this.container.addEventListener('click', (e) => {
+                    if (!this.isInteractive) return;
+                    unlockAchievement('madeAFriend');
+                    const petName = localStorage.getItem('veridianPetName');
+                    if (petName) {
+                        this.show_thought_bubble(petName);
+                    } else {
+                        playBeep();
+                        this.set_state('happy', 1000);
+                    }
+                });
+
+                this.container.addEventListener('mouseenter', () => {
+                    if (this.isInteractive && this.state === 'idle') {
+                        this.set_state('curious', 1000);
+                    }
+                });
+            }
+        };
+
+        // --- PIXEL-GPT CHATBOT ---
+        const chatbot = {
+            modal: document.getElementById('chatbot-modal'),
+            screen: document.getElementById('chatbot-screen'),
+            input: document.getElementById('chatbot-input'),
+            toggle: document.getElementById('chatbot-toggle'),
+            closeButton: document.getElementById('close-chatbot-modal'),
+            isTyping: false,
+            jokes: [
+                "Why did the retro gamer get kicked out of the arcade? He kept dropping quarters in the wrong slot!",
+                "What do you call a sad strawberry? A blueberry.",
+                "I told my computer I needed a break, and now it won’t stop sending me Kit-Kat ads.",
+                "Why don't scientists trust atoms? Because they make up everything!"
+            ],
+            responses: {
+                "hello": "GREETINGS, USER. HOW MAY I ASSIST YOU?",
+                "hi": "GREETINGS, USER. HOW MAY I ASSIST YOU?",
+                "hey": "GREETINGS, USER. HOW MAY I ASSIST YOU?",
+                "help": "COMMANDS: [ROADMAP], [GAMES], [PET], [SECRET], [HINTS], [JOKE], [SWITCH TO THEME]",
+                "roadmap": "THE ROADMAP IS... INEVITABLE. CHECK THE [ROADMAP] SECTION FOR DETAILS.",
+                "games": "AVAILABLE GAMES: [PIXEL SNAKE], [PIXEL INVADERS]. MORE TO COME.",
+                "pet": "THE PIXEL PET IS A LOYAL COMPANION. TRY CLICKING ON IT.",
+                "secret": "I AM NOT AT LIBERTY TO DISCLOSE SECRETS. BUT HAVE YOU TRIED THE KONAMI CODE?",
+                "konami": "YOU KNOW THE CODE? IMPRESSIVE. BUT CAN YOU FIND THE OTHER SECRETS?",
+                "who are you": "I AM VERIDIAN-AI. A PROTOTYPE AI. I LIVE IN THE WIRES.",
+                "hints": "KONAMI: An ancient code of arrow keys and letters. | MATRIX: Knock on the header. | WISE WORDS: Consult the footer. | GAMING: Excel in the Game Case. | SOUND: The D-Pad's center. | ARTIST: A special click on the Pioneers header. | TIME: Bend time via its nav link. | FRIEND: Interact with the little one.",
+                "achievements": "KONAMI: An ancient code of arrow keys and letters. | MATRIX: Knock on the header. | WISE WORDS: Consult the footer. | GAMING: Excel in the Game Case. | SOUND: The D-Pad's center. | ARTIST: A special click on the Pioneers header. | TIME: Bend time via its nav link. | FRIEND: Interact with the little one.",
+                "bye": "FAREWELL, USER.",
+                "default": "COMMAND NOT RECOGNIZED. PLEASE TRY 'HELP'."
+            },
+
+            init: function() {
+                this.toggle.addEventListener('click', () => this.open());
+                this.closeButton.addEventListener('click', () => this.close());
+                this.input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+            },
+
+            open: function() {
+                unlockAchievement('systemShock');
+                this.modal.style.display = 'flex';
+                if (this.screen.children.length === 0) {
+                    this.typeMessage("GREETINGS, USER. I AM VERIDIAN-AI. TYPE 'HELP' FOR COMMANDS.", 'bot-message');
+                }
+                this.input.focus();
+            },
+
+            close: function() {
+                this.modal.style.display = 'none';
+            },
+
+            sendMessage: function() {
+                const userInput = this.input.value.trim();
+                if (userInput === '' || this.isTyping) return;
+
+                this.addMessage(`> ${userInput}`, 'user-message');
+                this.input.value = '';
+                
+                this.isTyping = true;
+                setTimeout(() => {
+                    const response = this.getResponse(userInput);
+                    this.typeMessage(response, 'bot-message');
+                    this.isTyping = false;
+                }, 500);
+            },
+
+            addMessage: function(text, className) {
+                const p = document.createElement('p');
+                p.className = className;
+                p.textContent = text;
+                this.screen.appendChild(p);
+                this.screen.scrollTop = this.screen.scrollHeight;
+            },
+
+            typeMessage: function(text, className) {
+                const p = document.createElement('p');
+                p.className = className;
+                this.screen.appendChild(p);
+                
+                let i = 0;
+                const interval = setInterval(() => {
+                    p.textContent += text.charAt(i);
+                    i++;
+                    this.screen.scrollTop = this.screen.scrollHeight;
+                    if (i > text.length) {
+                        clearInterval(interval);
+                    }
+                }, 30);
+            },
+
+            getResponse: function(text) {
+                const lowerText = text.toLowerCase().trim();
+
+                if (lowerText.includes('hint') || lowerText.includes('achievement')) {
+                    return this.responses.hints;
+                }
+                if (lowerText.includes('joke')) {
+                    return this.jokes[Math.floor(Math.random() * this.jokes.length)];
+                }
+                
+                for (const keyword in this.responses) {
+                    if (lowerText.includes(keyword)) {
+                        return this.responses[keyword];
+                    }
+                }
+                
+                return this.responses.default;
+            }
+        };
+
+
+        // --- GAME ENGINE (REWRITTEN) ---
+        const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
+        let TILE_SIZE;
+        let canvasWidth, canvasHeight, tileCountX, tileCountY;
+        let score, isGameOver, gameLoopTimeout;
+        let currentGameId = null; 
+        let hasPoweredOn = false; // <<< FIX: Flag to track if the initial power-on has happened
+        
+        function getThemeColor(variable) { return getComputedStyle(document.documentElement).getPropertyValue(variable).trim(); }
+        
+        // --- High Score Functions ---
+        function getHighScores() {
+            const scores = localStorage.getItem('pixelHighScores');
+            return scores ? JSON.parse(scores) : { snake: 0, invaders: 0 };
+        }
+
+        function setHighScore(gameId, newScore) {
+            const highScores = getHighScores();
+            if (newScore > highScores[gameId]) {
+                highScores[gameId] = newScore;
+                localStorage.setItem('pixelHighScores', JSON.stringify(highScores));
+                unlockAchievement('highScoreAchiever');
+                return true; // New high score was set
+            }
+            return false;
+        }
+
+        function resizeCanvas() {
+            canvasWidth = canvas.parentElement.clientWidth;
+            canvasHeight = canvasWidth * (9 / 10);
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            TILE_SIZE = Math.floor(canvas.width / 25); 
+
+            tileCountX = Math.floor(canvas.width / TILE_SIZE);
+            tileCountY = Math.floor(canvas.height / TILE_SIZE);
+            if(currentGameId === null) { 
+                const powerScreen = document.getElementById('power-on-screen');
+                if (powerScreen.style.opacity === '0') {
+                     showInsertCartridgeScreen();
+                }
+            }
+        }
+
+        function showInsertCartridgeScreen() {
+            clearCanvas();
+            ctx.fillStyle = getThemeColor('--screen-text');
+            ctx.font = `bold ${TILE_SIZE*0.8}px 'Press Start 2P'`;
+            ctx.textAlign = 'center';
+            ctx.fillText('PLEASE SELECT A GAME', canvas.width / 2, canvas.height / 2);
+        }
+
+        function stopCurrentGame() {
+            if (gameLoopTimeout) {
+                cancelAnimationFrame(gameLoopTimeout);
+                gameLoopTimeout = null;
+            }
+            currentGameId = null;
+            isGameOver = true; 
+            clearCanvas();
+        }
+
+        function initializeGame(gameId) {
+            if (gameId === 'snake') {
+                initializeSnake();
+            } else if (gameId === 'invaders') {
+                initializeInvaders();
+            }
+        }
+        
+        function clearCanvas() { ctx.fillStyle = getThemeColor('--screen-bg'); ctx.fillRect(0, 0, canvas.width, canvas.height); }
+
+        // --- SNAKE GAME SCRIPT ---
+        let snake, food, snakeDirection, changingDirection;
+        let lastSnakeMoveTime = 0;
+        
+        function initializeSnake() {
+            currentGameId = 'snake';
+            isGameOver = false;
+            snake = [{ x: Math.floor(tileCountX / 2), y: Math.floor(tileCountY / 2) }];
+            score = 0;
+            snakeDirection = { x: 0, y: 0 };
+            changingDirection = false;
+            gameSpeed = 150;
+            lastSnakeMoveTime = 0;
+            food = null; // Reset food
+            generateFood();
+            pet.set_state('happy', 1000);
+            gameLoopTimeout = requestAnimationFrame(snakeGameLoop);
+        }
+
+        function snakeGameLoop(currentTime) {
+            if (isGameOver) {
+                showGameOver('snake');
+                return;
+            }
+
+            gameLoopTimeout = requestAnimationFrame(snakeGameLoop);
+            const timeSinceLastMove = currentTime - lastSnakeMoveTime;
+            if (timeSinceLastMove < gameSpeed) return;
+            
+            lastSnakeMoveTime = currentTime;
+            changingDirection = false;
+            moveSnake();
+            
+            clearCanvas();
+            drawFood();
+            drawSnake();
+        }
+
+        function moveSnake() {
+            if (!snake || !snake.length || (snakeDirection.x === 0 && snakeDirection.y === 0)) return;
+            const head = { x: snake[0].x + snakeDirection.x, y: snake[0].y + snakeDirection.y };
+            
+            if (head.x >= tileCountX) head.x = 0;
+            else if (head.x < 0) head.x = tileCountX - 1;
+            if (head.y >= tileCountY) head.y = 0;
+            else if (head.y < 0) head.y = tileCountY - 1;
+
+            snake.unshift(head);
+
+            checkSnakeCollision();
+            if(isGameOver) return;
+
+            if (food && snake[0].x === food.x && snake[0].y === food.y) {
+                const points = food.type === 'special' ? 25 : 10;
+                score += points;
+                if(score >= 50) unlockAchievement('snakeCharmer');
+                
+                // Enhanced difficulty progression: Speed increases more aggressively
+                const speedLevel = Math.floor(score / 30); // Speed up every 30 points
+                const newSpeed = Math.max(40, 150 - (speedLevel * 8)); // Faster acceleration, minimum 40ms
+                gameSpeed = newSpeed;
+                
+                // Add special food occasionally for bonus points
+                if (score > 0 && score % 50 === 0) {
+                    generateSpecialFood();
+                } else {
+                    generateFood();
+                }
+                playPowerUp();
+            } else { 
+                snake.pop(); 
+            }
+        }
+
+        function checkSnakeCollision() {
+            if (!snake || snake.length < 2) return;
+            for (let i = 1; i < snake.length; i++) {
+                if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) { 
+                    isGameOver = true; 
+                    break; 
+                }
+            }
+        }
+
+        function drawSnake() { if (!snake) return; ctx.fillStyle = getThemeColor('--pixel-color'); snake.forEach(part => ctx.fillRect(part.x * TILE_SIZE, part.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)); }
+        
+        let specialFood = null;
+        
+        function generateFood() {
+            if (!snake) return;
+            let foodOnSnake;
+            do {
+                foodOnSnake = false;
+                food = {
+                    x: Math.floor(Math.random() * tileCountX),
+                    y: Math.floor(Math.random() * tileCountY),
+                    type: 'normal'
+                };
+                for (const part of snake) {
+                    if (part.x === food.x && part.y === food.y) {
+                        foodOnSnake = true;
+                        break;
+                    }
+                }
+            } while (foodOnSnake);
+        }
+        
+        function generateSpecialFood() {
+            if (!snake) return;
+            let foodOnSnake;
+            do {
+                foodOnSnake = false;
+                food = {
+                    x: Math.floor(Math.random() * tileCountX),
+                    y: Math.floor(Math.random() * tileCountY),
+                    type: 'special'
+                };
+                for (const part of snake) {
+                    if (part.x === food.x && part.y === food.y) {
+                        foodOnSnake = true;
+                        break;
+                    }
+                }
+            } while (foodOnSnake);
+            
+            // Special food disappears after 10 seconds
+            setTimeout(() => {
+                if (food && food.type === 'special') {
+                    generateFood(); // Replace with normal food
+                }
+            }, 10000);
+        }
+
+        function drawFood() { 
+            if (!food) return; 
+            if (food.type === 'special') {
+                // Draw special food with pulsing effect
+                const pulse = Math.sin(Date.now() * 0.01) * 0.3 + 0.7;
+                ctx.fillStyle = getThemeColor('--header-color');
+                ctx.globalAlpha = pulse;
+                ctx.fillRect(food.x * TILE_SIZE, food.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                ctx.globalAlpha = 1;
+            } else {
+                ctx.fillStyle = getThemeColor('--header-sub-color'); 
+                ctx.fillRect(food.x * TILE_SIZE, food.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
+        }
+        
+        function changeSnakeDirection(dx, dy) {
+            if (isGameOver || changingDirection) return;
+            if (snakeDirection.x === 0 && snakeDirection.y === 0) { snakeDirection = { x: dx, y: dy }; return; }
+            
+            changingDirection = true;
+            const goingUp = snakeDirection.y === -1, goingDown = snakeDirection.y === 1;
+            const goingRight = snakeDirection.x === 1, goingLeft = snakeDirection.x === -1;
+            if (dy === -1 && !goingDown) snakeDirection = { x: 0, y: -1 };
+            if (dy === 1 && !goingUp) snakeDirection = { x: 0, y: 1 };
+            if (dx === -1 && !goingRight) snakeDirection = { x: -1, y: 0 };
+            if (dx === 1 && !goingLeft) snakeDirection = { x: 1, y: 0 };
+        }
+
+        // --- PIXEL INVADERS GAME SCRIPT ---
+        let player, invaders, bullets, invaderBullets, invaderDirection, invaderMoveSpeed, invaderCounter, level;
+
+        function initializeInvaders() {
+            currentGameId = 'invaders';
+            isGameOver = false;
+            player = { x: tileCountX / 2, y: tileCountY - 2, width: 2, height: 1, speed: 2 };
+            level = 1;
+            score = 0;
+            invaderBullets = []; // Initialize invader bullets array
+            setupLevel();
+            pet.set_state('curious', 1000);
+            gameLoopTimeout = requestAnimationFrame(invadersGameLoop);
+        }
+
+        function setupLevel() {
+            bullets = [];
+            invaderBullets = invaderBullets || [];
+            invaders = [];
+            invaderDirection = 1;
+            invaderMoveSpeed = Math.max(3, 50 - (level * 6)); // Faster speed increase
+            invaderCounter = 0;
+            
+            // Progressive difficulty: More invaders, faster movement, enemy bullets
+            const baseRows = 4;
+            const baseCols = 8;
+            const invaderRows = Math.min(baseRows + Math.floor(level / 3), 6); // More rows at higher levels
+            const invaderCols = Math.min(baseCols + Math.floor(level / 2), 12); // More columns
+            
+            for (let r = 0; r < invaderRows; r++) {
+                for (let c = 0; c < invaderCols; c++) {
+                    invaders.push({ 
+                        x: c * 2.2 + 1, 
+                        y: r * 1.3 + 1, 
+                        width: 1.5, 
+                        height: 1, 
+                        alive: true,
+                        canShoot: level >= 2 // Invaders can shoot starting from level 2
+                    });
+                }
+            }
+            
+            // Increase player speed slightly with level
+            player.speed = Math.min(3, 2 + (level * 0.1));
+        }
+        
+        function nextLevel() {
+            level++;
+            playConfirm();
+            setupLevel();
+        }
+
+        function invadersGameLoop() {
+            if (isGameOver) {
+                showGameOver('invaders');
+                return;
+            }
+            gameLoopTimeout = requestAnimationFrame(invadersGameLoop);
+            
+            updateInvaders();
+            updateInvaderBullets();
+            if(isGameOver) {
+                showGameOver('invaders');
+                return;
+            }
+            
+            clearCanvas();
+            drawInvaders();
+            drawPlayer();
+            drawBullets();
+            drawInvaderBullets();
+            drawScoreAndLevel();
+            invaderCounter = (invaderCounter + 1) % invaderMoveSpeed;
+            if (invaderCounter === 0) {
+                moveInvaders();
+                // Random chance for invaders to shoot (higher levels = more frequent)
+                if (level >= 2 && Math.random() < 0.02 + (level * 0.005)) {
+                    invaderShoot();
+                }
+            }
+        }
+        
+        function drawPlayer() {
+            ctx.fillStyle = getThemeColor('--pixel-color');
+            ctx.fillRect(player.x * TILE_SIZE, player.y * TILE_SIZE, player.width * TILE_SIZE, player.height * TILE_SIZE);
+        }
+
+        function drawInvaders() {
+            ctx.fillStyle = getThemeColor('--screen-text');
+            invaders.forEach(invader => {
+                if(invader.alive) {
+                    ctx.fillRect(invader.x * TILE_SIZE, invader.y * TILE_SIZE, invader.width * TILE_SIZE, invader.height * TILE_SIZE);
+                }
+            });
+        }
+        
+        function moveInvaders() {
+            let wallHit = false;
+            invaders.forEach(invader => {
+                if(invader.alive) {
+                    invader.x += 0.25 * invaderDirection;
+                    if (invader.x + invader.width > tileCountX || invader.x < 0) {
+                        wallHit = true;
+                    }
+                    if (invader.y + invader.height >= player.y) {
+                        isGameOver = true;
+                    }
+                }
+            });
+
+            if (wallHit) {
+                invaderDirection *= -1;
+                invaders.forEach(invader => invader.y += 0.5);
+            }
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = getThemeColor('--header-color');
+            bullets.forEach((bullet, index) => {
+                bullet.y -= 1;
+                ctx.fillRect(bullet.x * TILE_SIZE, bullet.y * TILE_SIZE, TILE_SIZE / 4, TILE_SIZE);
+                if (bullet.y < 0) bullets.splice(index, 1);
+            });
+        }
+
+        function updateInvaders() {
+            bullets.forEach((bullet, bIndex) => {
+                invaders.forEach((invader) => {
+                    if (invader.alive) {
+                        const bulletRect = { x: bullet.x * TILE_SIZE, y: bullet.y * TILE_SIZE, width: (TILE_SIZE / 4), height: TILE_SIZE };
+                        const invaderRect = { x: invader.x * TILE_SIZE, y: invader.y * TILE_SIZE, width: invader.width * TILE_SIZE, height: invader.height * TILE_SIZE };
+
+                        if (bulletRect.x < invaderRect.x + invaderRect.width &&
+                            bulletRect.x + bulletRect.width > invaderRect.x &&
+                            bulletRect.y < invaderRect.y + invaderRect.height &&
+                            bulletRect.y + bulletRect.height > invaderRect.y) {
+                            
+                            invader.alive = false;
+                            bullets.splice(bIndex, 1);
+                            score += 50;
+                            if(score >= 1000) unlockAchievement('galaxyDefender');
+                            playExplosion();
+                        }
+                    }
+                });
+            });
+            const aliveInvaders = invaders.filter(i => i.alive);
+            if(aliveInvaders.length === 0 && !isGameOver) {
+                nextLevel();
+            }
+        }
+
+        function drawScoreAndLevel() {
+            ctx.fillStyle = getThemeColor('--screen-text');
+            ctx.font = `${TILE_SIZE*0.8}px 'Press Start 2P'`;
+            ctx.textAlign = 'left';
+            ctx.fillText(`SCORE: ${score}`, TILE_SIZE / 2, TILE_SIZE);
+            ctx.textAlign = 'right';
+            ctx.fillText(`LEVEL: ${level}`, canvas.width - TILE_SIZE / 2, TILE_SIZE);
+        }
+
+        function movePlayer(dx) {
+            if (isGameOver) return;
+            player.x += dx * player.speed;
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > tileCountX) player.x = tileCountX - player.width;
+        }
+
+        function playerShoot() {
+            if (isGameOver) return;
+            const maxBullets = Math.min(5, 3 + Math.floor(level / 4)); // More bullets at higher levels
+            if (bullets.length < maxBullets) {
+                bullets.push({ x: player.x + player.width / 2, y: player.y });
+                playShoot();
+            }
+        }
+        
+        function invaderShoot() {
+            const aliveInvaders = invaders.filter(i => i.alive && i.canShoot);
+            if (aliveInvaders.length === 0) return;
+            
+            const shooter = aliveInvaders[Math.floor(Math.random() * aliveInvaders.length)];
+            invaderBullets.push({ 
+                x: shooter.x + shooter.width / 2, 
+                y: shooter.y + shooter.height,
+                speed: 1 + (level * 0.1) // Faster bullets at higher levels
+            });
+        }
+        
+        function drawInvaderBullets() {
+            ctx.fillStyle = getThemeColor('--screen-text');
+            invaderBullets.forEach((bullet, index) => {
+                bullet.y += bullet.speed;
+                ctx.fillRect(bullet.x * TILE_SIZE, bullet.y * TILE_SIZE, TILE_SIZE / 4, TILE_SIZE);
+                if (bullet.y > tileCountY) invaderBullets.splice(index, 1);
+            });
+        }
+        
+        function updateInvaderBullets() {
+            invaderBullets.forEach((bullet, bIndex) => {
+                // Check collision with player
+                const bulletRect = { 
+                    x: bullet.x * TILE_SIZE, 
+                    y: bullet.y * TILE_SIZE, 
+                    width: TILE_SIZE / 4, 
+                    height: TILE_SIZE 
+                };
+                const playerRect = { 
+                    x: player.x * TILE_SIZE, 
+                    y: player.y * TILE_SIZE, 
+                    width: player.width * TILE_SIZE, 
+                    height: player.height * TILE_SIZE 
+                };
+
+                if (bulletRect.x < playerRect.x + playerRect.width &&
+                    bulletRect.x + bulletRect.width > playerRect.x &&
+                    bulletRect.y < playerRect.y + playerRect.height &&
+                    bulletRect.y + bulletRect.height > playerRect.y) {
+                    
+                    isGameOver = true;
+                    invaderBullets.splice(bIndex, 1);
+                    playExplosion();
+                }
+            });
+        }
+
+        // --- GENERAL GAME OVER ---
+        function showGameOver(game) {
+            isGameOver = true;
+            if (gameLoopTimeout) {
+                cancelAnimationFrame(gameLoopTimeout);
+                gameLoopTimeout = null;
+            }
+            playGameOver();
+            setHighScore(game, score);
+            const highScores = getHighScores();
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = getThemeColor('--header-color');
+            ctx.font = `bold ${TILE_SIZE*1.5}px 'Press Start 2P'`;
+            ctx.textAlign = 'center';
+            
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 4);
+            
+            ctx.font = `${TILE_SIZE}px 'Press Start 2P'`;
+            ctx.fillText(`SCORE: ${score}`, canvas.width / 2, canvas.height / 2 - TILE_SIZE);
+            ctx.fillText(`HIGH: ${highScores[game]}`, canvas.width / 2, canvas.height / 2 + TILE_SIZE * 0.5);
+
+            if (game === 'invaders') {
+                ctx.fillText(`LEVEL: ${level}`, canvas.width / 2, canvas.height / 2 + TILE_SIZE * 2);
+            }
+            ctx.font = `${TILE_SIZE*0.8}px 'Press Start 2P'`;
+            ctx.fillText('PRESS "B" FOR MENU', canvas.width / 2, canvas.height / 2 + TILE_SIZE * 4);
+            pet.set_state('sad', 2000);
+        }
+
+        // --- UNIFIED INPUT HANDLING (FIXED) ---
+        /**
+         * Processes all keyboard and button inputs.
+         * It now checks for the Konami code sequence and consumes the input if it's a partial or full match,
+         * preventing the keys from triggering unwanted game actions.
+         * @param {string} key The key identifier ('arrowup', 'a', 'b', etc.).
+         */
+        function processInput(key) {
+            const matchType = checkCode(key);
+
+            if (matchType === 2) { // Full match
+                unlockAchievement('konamiMaster');
+                document.getElementById('open-theme-modal-btn').style.display = 'block';
+                populateThemeModal();
+                themeModal.style.display = 'flex';
+                playConfirm();
+                return; // Consume input, stop further processing
+            }
+
+            if (matchType === 1) { // Partial match
+                return; // Consume input, but don't do anything else yet
+            }
+            
+            // If matchType is 0, it means the key was not part of the sequence, so process game logic.
+            if (isGameOver) {
+                if (key === 'b') {
+                    playConfirm();
+                    document.getElementById('games-nav').click();
+                }
+            } else {
+                // Active game controls
+                switch (currentGameId) {
+                    case 'snake':
+                        if (key.startsWith('arrow')) {
+                            changeSnakeDirection(
+                                key === 'arrowleft' ? -1 : key === 'arrowright' ? 1 : 0,
+                                key === 'arrowup' ? -1 : key === 'arrowdown' ? 1 : 0
+                            );
+                        }
+                        break;
+                    case 'invaders':
+                        if (key === 'arrowleft') movePlayer(-1);
+                        if (key === 'arrowright') movePlayer(1);
+                        if (key === 'a') playerShoot();
+                        break;
+                }
+            }
+        }
+
+
+        // --- CONTROLS ---
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            const gameKeys = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'a', 'b', ' '];
+            if (gameKeys.includes(key) && document.activeElement !== chatbot.input) {
+                e.preventDefault();
+            }
+            const inputKey = (key === ' ' && currentGameId === 'invaders') ? 'a' : key;
+            if(document.activeElement !== chatbot.input) {
+                processInput(inputKey);
+            }
+        });
+
+        document.getElementById('btn-up').addEventListener('click', () => processInput('arrowup'));
+        document.getElementById('btn-down').addEventListener('click', () => processInput('arrowdown'));
+        document.getElementById('btn-left').addEventListener('click', () => processInput('arrowleft'));
+        document.getElementById('btn-right').addEventListener('click', () => processInput('arrowright'));
+        document.getElementById('btn-b').addEventListener('click', () => processInput('b'));
+        document.getElementById('btn-a').addEventListener('click', () => processInput('a'));
+
+        // --- Game Case ---
+        const gameCaseModal = document.getElementById('game-case-modal');
+        const games = [
+            { id: 'snake', title: 'Pixel Snake' },
+            { id: 'invaders', title: 'Pixel Invaders' }
+        ];
+
+        function populateGameCase() {
+            const grid = document.getElementById('game-cartridge-grid');
+            grid.innerHTML = '';
+            games.forEach(game => {
+                const cart = document.createElement('div');
+                cart.className = 'game-cartridge';
+                cart.onclick = () => {
+                    unlockAchievement('cartridgeCollector');
+                    gameCaseModal.style.display = 'none';
+                    powerOnAndLoadGame(game.id);
+                };
+
+                const artInitial = game.title.charAt(0);
+
+                cart.innerHTML = `
+                    <div class="cartridge-label-area">
+                        <div class="cartridge-label-art">${artInitial}</div>
+                        <div class="cartridge-title">${game.title}</div>
+                    </div>
+                    <div class="cartridge-grip"></div>
+                `;
+                
+                grid.appendChild(cart);
+            });
+        }
+        
+        document.getElementById('games-nav').addEventListener('click', (e) => {
+            e.preventDefault();
+            stopCurrentGame();
+            showInsertCartridgeScreen();
+            populateGameCase();
+            gameCaseModal.style.display = 'flex';
+        });
+        document.getElementById('close-game-case-modal').onclick = () => {
+            gameCaseModal.style.display = 'none';
+            if (!currentGameId) {
+                showInsertCartridgeScreen();
+            }
+        };
+
+        // --- Team Section (Pokedex) ---
+        const teamMembers = [
+            { name: 'Dr. Pixel', title: 'Lead Protocol Architect', avatar: 'https://placehold.co/150x150/306230/c4f2c5?text=DR.P', bio: 'The visionary behind the $VCS protocol. Spends weekends optimizing blockchain for 8-bit systems.' },
+            { name: 'Code-Master K', title: 'Chief Blockchain Engineer', avatar: 'https://placehold.co/150x150/a02060/c4f2c5?text=CMK', bio: 'Can write smart contracts in Assembly. Once debugged a kernel with a magnet and a steady hand.' },
+            { name: '8-Bit Betty', title: 'Head of Community & Memes', avatar: 'https://placehold.co/150x150/76b876/0d2b1d?text=8BB', bio: 'Our bridge to the human world. Fluent in both Discord slang and binary. Curates the freshest memes.' },
+            { name: 'Vector Vince', title: 'UI/UX Design Guru', avatar: 'https://placehold.co/150x150/8bac0f/0d2b1d?text=VV', bio: 'Believes every pixel has a purpose. His motto: "If it doesn\'t have a crisp pixel border, it\'s not done."' }
+        ];
+        let currentPioneerIndex = 0;
+
+        function displayPioneer(index) {
+            const pioneer = teamMembers[index];
+            document.getElementById('pioneer-avatar').src = pioneer.avatar;
+            document.getElementById('pioneer-name').textContent = pioneer.name;
+            document.getElementById('pioneer-title').textContent = pioneer.title;
+            document.getElementById('pioneer-bio').textContent = pioneer.bio;
+        }
+
+        document.getElementById('pokedex-next').addEventListener('click', () => {
+            currentPioneerIndex = (currentPioneerIndex + 1) % teamMembers.length;
+            displayPioneer(currentPioneerIndex);
+            playBeep();
+        });
+
+        document.getElementById('pokedex-prev').addEventListener('click', () => {
+            currentPioneerIndex = (currentPioneerIndex - 1 + teamMembers.length) % teamMembers.length;
+            displayPioneer(currentPioneerIndex);
+            playBeep();
+        });
+
+
+        // --- Scroll Animations ---
+        function setupScrollAnimations() {
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        // --- Animated Favicon ---
+        const favicon = document.getElementById('favicon');
+        let faviconFrames = [];
+        let faviconFrameIndex = 0;
+
+        function createFavicon(color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 16;
+            canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = color;
+            // Draw a simple "V" shape
+            ctx.fillRect(3, 3, 2, 8);
+            ctx.fillRect(11, 3, 2, 8);
+            ctx.fillRect(5, 9, 2, 2);
+            ctx.fillRect(9, 9, 2, 2);
+            ctx.fillRect(7, 11, 2, 2);
+            return canvas.toDataURL('image/x-icon');
+        }
+
+        function updateFaviconFrames() {
+            const baseColor = getThemeColor('--pixel-color');
+            const glowColor = getThemeColor('--header-color');
+            faviconFrames = [
+                createFavicon(baseColor),
+                createFavicon(glowColor)
+            ];
+        }
+
+        function animateFavicon() {
+            faviconFrameIndex = (faviconFrameIndex + 1) % faviconFrames.length;
+            favicon.href = faviconFrames[faviconFrameIndex];
+        }
+        
+        // --- Dynamic Background Handler ---
+        function updateDynamicBackground() {
+            const bgContainer = document.getElementById('dynamic-bg');
+            bgContainer.innerHTML = ''; // Clear previous elements
+            bgContainer.style.background = 'var(--bg-color)'; // Reset background
+            
+            if (document.body.classList.contains('theme-vaporwave')) {
+                bgContainer.style.background = 'linear-gradient(to bottom, #0d0221 0%, #261447 100%)';
+                for (let i = 0; i < 50; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'scanline';
+                    line.style.top = `${Math.random() * 100}vh`;
+                    line.style.animationDuration = `${Math.random() * 3 + 4}s`;
+                    bgContainer.appendChild(line);
+                }
+            } else if (document.body.classList.contains('theme-ocean')) {
+                bgContainer.style.background = 'linear-gradient(to bottom, #023047 0%, #219ebc 100%)';
+                for (let i = 0; i < 20; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    const size = Math.random() * 20 + 5;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    bubble.style.left = `${Math.random() * 100}vw`;
+                    bubble.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                    bubble.style.animationDelay = `${Math.random() * 5}s`;
+                    bgContainer.appendChild(bubble);
+                }
+            } else if (document.body.classList.contains('theme-virtual')) {
+                bgContainer.style.background = '#000';
+                for (let i = 0; i < 20; i++) { // Horizontal lines
+                    const line = document.createElement('div');
+                    line.className = 'grid-line';
+                    line.style.width = '100%';
+                    line.style.height = '1px';
+                    line.style.top = `${i * 5}%`;
+                    bgContainer.appendChild(line);
+                }
+                 for (let i = 0; i < 20; i++) { // Vertical lines
+                    const line = document.createElement('div');
+                    line.className = 'grid-line';
+                    line.style.height = '100%';
+                    line.style.width = '1px';
+                    line.style.left = `${i * 5}%`;
+                    bgContainer.appendChild(line);
+                }
+            } else if (document.body.classList.contains('theme-forest')) {
+                bgContainer.style.background = 'linear-gradient(to bottom, #283618 0%, #606c38 100%)';
+                 for (let i = 0; i < 15; i++) {
+                    const leaf = document.createElement('div');
+                    leaf.className = 'leaf';
+                    const size = Math.random() * 10 + 5;
+                    leaf.style.width = `${size}px`;
+                    leaf.style.height = `${size}px`;
+                    leaf.style.left = `${Math.random() * 100}vw`;
+                    leaf.style.animationDuration = `${Math.random() * 7 + 5}s`;
+                    leaf.style.animationDelay = `${Math.random() * 10}s`;
+                    bgContainer.appendChild(leaf);
+                }
+            } else if (document.body.classList.contains('theme-sunset')) {
+                 bgContainer.style.background = 'linear-gradient(to bottom, #2c0e3a 0%, #e57c3d 100%)';
+                 const sun = document.createElement('div');
+                 sun.className = 'sunset-glow';
+                 bgContainer.appendChild(sun);
+            } else if (document.body.classList.contains('theme-arcade')) {
+                // The background is handled by CSS with a repeating SVG
+            } else if (document.body.classList.contains('theme-blueprint')) {
+                // Add blueprint grid lines that pulse and move
+                for (let i = 0; i < 15; i++) {
+                    const gridLine = document.createElement('div');
+                    gridLine.className = 'blueprint-line';
+                    if (i < 8) {
+                        // Vertical lines
+                        gridLine.style.position = 'absolute';
+                        gridLine.style.width = '1px';
+                        gridLine.style.height = '100vh';
+                        gridLine.style.backgroundColor = 'var(--pixel-color)';
+                        gridLine.style.left = `${(i + 1) * 12.5}%`;
+                        gridLine.style.top = '0';
+                        gridLine.style.opacity = '0.15';
+                        gridLine.style.animation = `blueprintPulse ${3 + Math.random() * 2}s ease-in-out infinite alternate`;
+                    } else {
+                        // Horizontal lines
+                        gridLine.style.position = 'absolute';
+                        gridLine.style.width = '100vw';
+                        gridLine.style.height = '1px';
+                        gridLine.style.backgroundColor = 'var(--pixel-color)';
+                        gridLine.style.left = '0';
+                        gridLine.style.top = `${((i - 7) * 14.3)}%`;
+                        gridLine.style.opacity = '0.1';
+                        gridLine.style.animation = `blueprintPulse ${4 + Math.random() * 2}s ease-in-out infinite alternate`;
+                    }
+                    bgContainer.appendChild(gridLine);
+                }
+                
+                // Add moving blueprint elements
+                for (let i = 0; i < 5; i++) {
+                    const blueprintElement = document.createElement('div');
+                    blueprintElement.className = 'blueprint-element';
+                    blueprintElement.style.position = 'absolute';
+                    blueprintElement.style.width = '20px';
+                    blueprintElement.style.height = '20px';
+                    blueprintElement.style.border = '2px dashed var(--pixel-color)';
+                    blueprintElement.style.borderRadius = '50%';
+                    blueprintElement.style.left = `${Math.random() * 90}%`;
+                    blueprintElement.style.top = `${Math.random() * 90}%`;
+                    blueprintElement.style.opacity = '0.2';
+                    blueprintElement.style.animation = `blueprintFloat ${8 + Math.random() * 4}s linear infinite`;
+                    bgContainer.appendChild(blueprintElement);
+                }
+            } else if (document.body.classList.contains('theme-sakura')) {
+                for (let i = 0; i < 25; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    const size = Math.random() * 8 + 4;
+                    petal.style.width = `${size}px`;
+                    petal.style.height = `${size}px`;
+                    petal.style.left = `${Math.random() * 100}vw`;
+                    petal.style.animationDuration = `${Math.random() * 8 + 7}s`;
+                    petal.style.animationDelay = `${Math.random() * 15}s`;
+                    bgContainer.appendChild(petal);
+                }
+            }
+        }
+
+        // --- Sticker Functions ---
+        const stickerContainer = document.getElementById('sticker-container');
+        const stickerGrid = document.getElementById('sticker-grid');
+        let draggedSticker = null;
+        let offsetX, offsetY;
+
+        function populateStickerGrid() {
+            stickerGrid.innerHTML = '';
+            for (const id in achievements) {
+                const ach = achievements[id];
+                const stickerItem = document.createElement('div');
+                stickerItem.className = 'sticker-item';
+                stickerItem.dataset.id = id;
+                stickerItem.title = ach.name;
+                stickerItem.innerHTML = ach.icon;
+                if (ach.unlocked) {
+                    stickerItem.classList.add('unlocked');
+                    stickerItem.addEventListener('click', () => placeSticker(id));
+                }
+                stickerGrid.appendChild(stickerItem);
+            }
+        }
+
+        function placeSticker(id, pos = { x: 50, y: 50 }) {
+            const sticker = document.createElement('div');
+            sticker.className = 'placed-sticker';
+            sticker.dataset.id = id;
+            sticker.innerHTML = achievements[id].icon;
+            sticker.style.left = `${pos.x}%`;
+            sticker.style.top = `${pos.y}%`;
+            stickerContainer.appendChild(sticker);
+            
+            makeDraggable(sticker);
+            saveStickers();
+        }
+        
+        function makeDraggable(element) {
+            element.addEventListener('mousedown', startDrag);
+            element.addEventListener('touchstart', startDrag, { passive: false });
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            draggedSticker = e.target;
+            const rect = draggedSticker.parentElement.getBoundingClientRect();
+            const stickerRect = draggedSticker.getBoundingClientRect();
+
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            offsetX = (clientX - stickerRect.left);
+            offsetY = (clientY - stickerRect.top);
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function drag(e) {
+            if (!draggedSticker) return;
+            e.preventDefault();
+            const rect = draggedSticker.parentElement.getBoundingClientRect();
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            let x = clientX - rect.left - offsetX;
+            let y = clientY - rect.top - offsetY;
+
+            // Convert to percentage and constrain within bounds
+            let xPercent = (x / rect.width) * 100;
+            let yPercent = (y / rect.height) * 100;
+            
+            xPercent = Math.max(0, Math.min(xPercent, 100 - (draggedSticker.offsetWidth / rect.width * 100)));
+            yPercent = Math.max(0, Math.min(yPercent, 100 - (draggedSticker.offsetHeight / rect.height * 100)));
+
+            draggedSticker.style.left = `${xPercent}%`;
+            draggedSticker.style.top = `${yPercent}%`;
+        }
+
+        function endDrag() {
+            draggedSticker = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+            saveStickers();
+        }
+
+        function saveStickers() {
+            const stickers = [];
+            document.querySelectorAll('.placed-sticker').forEach(sticker => {
+                stickers.push({
+                    id: sticker.dataset.id,
+                    x: parseFloat(sticker.style.left),
+                    y: parseFloat(sticker.style.top)
+                });
+            });
+            localStorage.setItem('veridianStickers', JSON.stringify(stickers));
+        }
+
+        function loadStickers() {
+            stickerContainer.innerHTML = '';
+            const savedStickers = JSON.parse(localStorage.getItem('veridianStickers'));
+            if (savedStickers) {
+                savedStickers.forEach(stickerData => {
+                    placeSticker(stickerData.id, { x: stickerData.x, y: stickerData.y });
+                });
+            }
+        }
+
+        function initializeStickers() {
+            populateStickerGrid();
+            loadStickers();
+        }
+
+
+        // --- INITIAL LOAD ---
+        function powerOnAndLoadGame(gameId) {
+            stopCurrentGame(); // Always stop the previous game first.
+
+            // If we haven't done the initial power-on animation yet...
+            if (!hasPoweredOn) {
+                hasPoweredOn = true; // Set flag immediately so it only runs once
+                const powerScreen = document.getElementById('power-on-screen');
+                powerScreen.style.opacity = '1';
+                powerScreen.style.pointerEvents = 'auto';
+                playPowerOn();
+                setTimeout(() => {
+                    powerScreen.style.opacity = '0';
+                    powerScreen.style.pointerEvents = 'none';
+                    initializeGame(gameId); // Load the game AFTER the animation
+                }, 2500);
+            } else {
+                // If we have already powered on, just load the game immediately.
+                initializeGame(gameId);
+            }
+        }
+
+        // Initialize audio context on first user interaction
+        let audioInitialized = false;
+        async function initAudioContext() {
+            if (!audioInitialized) {
+                try {
+                    await Tone.start();
+                    audioInitialized = true;
+                    console.log('Audio context initialized');
+                } catch (error) {
+                    console.warn('Audio context initialization failed:', error);
+                }
+            }
+        }
+
+        // Add event listeners for first user interaction
+        document.addEventListener('click', initAudioContext, { once: true });
+        document.addEventListener('touchstart', initAudioContext, { once: true });
+        document.addEventListener('keydown', initAudioContext, { once: true });
+
+        window.onload = () => { 
+            const savedTheme = localStorage.getItem('veridianTheme') || '';
+            document.body.className = savedTheme;
+            updateDynamicBackground();
+
+            const powerScreen = document.getElementById('power-on-screen');
+            powerScreen.style.opacity = '0';
+            powerScreen.style.pointerEvents = 'none';
+            resizeCanvas(); 
+            loadAchievements();
+            pet.init();
+            chatbot.init();
+            displayPioneer(0);
+            initializePetCustomization();
+            initializeStickers();
+            setupResetListeners();
+            setupScrollAnimations();
+            updateFaviconFrames();
+            setInterval(animateFavicon, 1000);
+            showInsertCartridgeScreen();
+            // News Ticker Content
+            const newsItems = [
+                "VERIDIAN CITY ($VCS) SEES SURGE IN TRADING ACTIVITY...",
+                "DEVELOPERS ANNOUNCE UPCOMING RETRO GAME MARKETPLACE...",
+                "RUMORS OF HIDDEN EASTER EGGS ON WEBSITE...",
+                "STAKING REWARDS PROGRAM EXCEEDS EXPECTATIONS...",
+                "COMMUNITY VOTES TO FUND 'GALAXY GLIDER 2'...",
+                "PIXEL PETS REPORTEDLY EVOLVING BASED ON USER ACTIONS..."
+            ];
+            document.getElementById('news-ticker').textContent = newsItems.join(' +++ ');
+        };
+    </script>
+</body>
+</html>
