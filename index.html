@@ -774,6 +774,7 @@
                 <div>
                     <h3 class="text-lg mb-2">[STICKERS]</h3>
                     <div id="sticker-grid"></div>
+                    <button id="clear-stickers-btn" class="social-btn w-full mt-2 text-sm py-1">[CLEAR STICKERS]</button>
                 </div>
 
                 <div>
@@ -1024,34 +1025,24 @@
         
         /**
          * Checks if the entered key is part of the Konami code sequence.
-         * This new implementation correctly tracks the sequence and resets if a wrong key is pressed.
          * @param {string} key The key that was pressed.
-         * @returns {number} 0 for no match, 1 for a partial match, 2 for a full match.
+         * @returns {boolean} True if the code was completed, false otherwise.
          */
         function checkCode(key) {
             const lowerKey = key.toLowerCase();
 
-            // Check if the current key is the next one in the sequence
             if (konamiCode[konamiCodeSequence.length] === lowerKey) {
                 konamiCodeSequence.push(lowerKey);
             } else {
-                // If the key is wrong, reset the sequence.
-                // But if the wrong key is the first key of the code, start a new sequence.
                 konamiCodeSequence = (konamiCode[0] === lowerKey) ? [lowerKey] : [];
             }
 
-            // Check for full match
             if (konamiCodeSequence.length === konamiCode.length) {
                 konamiCodeSequence = []; // Reset for the next attempt
-                return 2; // Full match
+                return true; // Full match
             }
             
-            // Check for partial match
-            if (konamiCodeSequence.length > 0) {
-                return 1; // Partial match
-            }
-
-            return 0; // No match
+            return false; // No full match yet
         }
 
         closeThemeModal.onclick = () => { themeModal.style.display = 'none'; };
@@ -1109,7 +1100,8 @@
             timeTraveler: { name: "Time Traveler", desc: "Bent the rules of time.", unlocked: false, icon: '⏳' },
             cartridgeCollector: { name: "Cartridge Collector", desc: "Selected a game to play.", unlocked: false, icon: '💾' },
             madeAFriend: { name: "Made a Friend", desc: "Played with the pixel pet.", unlocked: false, icon: '❤️' },
-            highScoreAchiever: { name: "Record Breaker", desc: "Set a new high score.", unlocked: false, icon: '🏆' }
+            highScoreAchiever: { name: "Record Breaker", desc: "Set a new high score.", unlocked: false, icon: '🏆' },
+            soundEngineer: { name: "Sound Engineer", desc: "Found the hidden sound test menu.", unlocked: false, icon: '🎵' }
         };
         const achievementPopup = document.getElementById('achievement-unlocked');
         const achievementName = document.getElementById('achievement-name');
@@ -1173,6 +1165,7 @@
                 for (const name in sounds) {
                     const btn = document.createElement('button');
                     btn.className = 'social-btn py-2';
+                    btn.textContent = `[${name}]`;
                     btn.onclick = sounds[name];
                     soundGrid.appendChild(btn);
                 }
@@ -1213,22 +1206,20 @@
                 heart: {
                     name: 'Heart',
                     width: 5,
+                    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />`,
                     data: [0,1,1,0,0,1,1,1,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,0]
                 },
                 star: {
                     name: 'Star',
                     width: 5,
+                    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.25l-6.18 3.77L7 14.14 2 9.27l6.91-1.01L12 2z" />`,
                     data: [0,0,1,0,0,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,0,1,0,1,0]
                 },
                 coin: {
                     name: 'Coin',
                     width: 4,
+                    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm0-4c-3.314 0-6 2.686-6 6s2.686 6 6 6 6-2.686 6-6-2.686-6-6-6z" />`,
                     data: [0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0]
-                },
-                pet: {
-                    name: 'Pet',
-                    width: 5,
-                    data: [0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1,0,0,0,0,0,0]
                 }
             };
             
@@ -1252,17 +1243,18 @@
                 button.title = title;
                 button.innerHTML = `<svg class="tool-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">${iconSvg}</svg>`;
                 button.onclick = () => {
-                    toolsContainer.querySelector('.selected')?.classList.remove('selected');
+                    toolsContainer.querySelectorAll('.selected')?.forEach(el => el.classList.remove('selected'));
                     paletteContainer.querySelector('.selected')?.classList.remove('selected');
                     button.classList.add('selected');
                     currentTool = toolName;
+                    selectedStamp = null; // Deselect stamp if another tool is chosen
                 };
                 return button;
             };
 
             const pencilTool = createToolButton('draw', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" />`, "Pencil");
             const eraserTool = createToolButton('erase', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />`, "Eraser");
-            const fillTool = createToolButton('fill', `<path fill="currentColor" d="M2,2 L2,22 L22,22 L22,2 Z M4,4 L20,4 L20,20 L4,20 Z" /><path fill="currentColor" d="M11.5,12.5 L22,2" stroke="currentColor" stroke-width="2" />`, "Fill");
+            const fillTool = createToolButton('fill', `<path fill-rule="evenodd" clip-rule="evenodd" d="M2 5.998C2 4.894 2.895 4 3.998 4h16.004C21.106 4 22 4.894 22 5.998v12.004C22 19.106 21.106 20 20.002 20H3.998C2.895 20 2 19.106 2 18.002V5.998zM10.82 1c.26-.62.906-1 1.6-1 .693 0 1.338.38 1.6.999L16 6h-8l1.82-5z" fill="currentColor"/>`, "Fill");
             
             toolsContainer.appendChild(pencilTool);
             toolsContainer.appendChild(eraserTool);
@@ -1287,7 +1279,7 @@
                 }
                 swatch.addEventListener('click', () => {
                     paletteContainer.querySelector('.selected')?.classList.remove('selected');
-                    toolsContainer.querySelector('.selected')?.classList.remove('selected');
+                    toolsContainer.querySelectorAll('.selected')?.forEach(el => el.classList.remove('selected'));
                     swatch.classList.add('selected');
                     pencilTool.classList.add('selected');
                     selectedColor = color;
@@ -1299,9 +1291,9 @@
             // --- Stamps ---
             for(const stampId in stamps) {
                 const stamp = stamps[stampId];
-                const stampButton = createToolButton('stamp', `<path d="M5 3v4M3 5h4M15 3v4M13 5h4M5 15v4M3 17h4M15 15v4M13 17h4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`, stamp.name); // Placeholder
+                const stampButton = createToolButton('stamp', stamp.icon, stamp.name);
                 stampButton.onclick = () => {
-                    toolsContainer.querySelector('.selected')?.classList.remove('selected');
+                    toolsContainer.querySelectorAll('.selected')?.forEach(el => el.classList.remove('selected'));
                     paletteContainer.querySelector('.selected')?.classList.remove('selected');
                     stampButton.classList.add('selected');
                     currentTool = 'stamp';
@@ -1368,7 +1360,9 @@
                         const y = startY + Math.floor(i / selectedStamp.width);
                         if (x < GRID_SIZE && y < GRID_SIZE) {
                             const index = y * GRID_SIZE + x;
-                            drawPixel(index);
+                            // Use the currently selected color for the stamp
+                            gridData[index] = selectedColor;
+                            gridContainer.children[index].style.backgroundColor = selectedColor;
                         }
                     }
                 }
@@ -1473,6 +1467,7 @@
         const resetConfirmModal = document.getElementById('reset-confirm-modal');
         const confirmResetBtn = document.getElementById('confirm-reset-btn');
         const cancelResetBtn = document.getElementById('cancel-reset-btn');
+        const clearStickersBtn = document.getElementById('clear-stickers-btn');
 
 
         function initializePetCustomization() {
@@ -1560,6 +1555,13 @@
                 playGameOver();
                 resetConfirmModal.style.display = 'none';
                 settingsModal.style.display = 'none';
+            });
+            
+            // [FIXED] Added event listener for the clear stickers button
+            clearStickersBtn.addEventListener('click', () => {
+                localStorage.removeItem('veridianStickers');
+                document.getElementById('sticker-container').innerHTML = '';
+                playBeep();
             });
         }
 
@@ -1691,7 +1693,7 @@
                         const hint = this.hints[Math.floor(Math.random() * this.hints.length)];
                         this.show_thought_bubble(hint);
                     } else if (rand < 0.6) { // 50% chance for another animation
-                        const randomState = states[Math.floor(Math.random() * states.length)];
+                        const randomState = states[Math.floor(Math.random() * this.hints.length)];
                         this.set_state(randomState, 3000);
                     }
                     // Otherwise, it stays in the default idle animation
@@ -1842,7 +1844,7 @@
         let canvasWidth, canvasHeight, tileCountX, tileCountY;
         let score, isGameOver, gameLoopTimeout;
         let currentGameId = null; 
-        let hasPoweredOn = false; // <<< FIX: Flag to track if the initial power-on has happened
+        let hasPoweredOn = false; 
         
         function getThemeColor(variable) { return getComputedStyle(document.documentElement).getPropertyValue(variable).trim(); }
         
@@ -1966,12 +1968,10 @@
                 score += points;
                 if(score >= 50) unlockAchievement('snakeCharmer');
                 
-                // Enhanced difficulty progression: Speed increases more aggressively
-                const speedLevel = Math.floor(score / 30); // Speed up every 30 points
-                const newSpeed = Math.max(40, 150 - (speedLevel * 8)); // Faster acceleration, minimum 40ms
+                const speedLevel = Math.floor(score / 30);
+                const newSpeed = Math.max(40, 150 - (speedLevel * 8));
                 gameSpeed = newSpeed;
                 
-                // Add special food occasionally for bonus points
                 if (score > 0 && score % 50 === 0) {
                     generateSpecialFood();
                 } else {
@@ -2034,10 +2034,9 @@
                 }
             } while (foodOnSnake);
             
-            // Special food disappears after 10 seconds
             setTimeout(() => {
                 if (food && food.type === 'special') {
-                    generateFood(); // Replace with normal food
+                    generateFood();
                 }
             }, 10000);
         }
@@ -2045,7 +2044,6 @@
         function drawFood() { 
             if (!food) return; 
             if (food.type === 'special') {
-                // Draw special food with pulsing effect
                 const pulse = Math.sin(Date.now() * 0.01) * 0.3 + 0.7;
                 ctx.fillStyle = getThemeColor('--header-color');
                 ctx.globalAlpha = pulse;
@@ -2059,16 +2057,27 @@
         
         function changeSnakeDirection(dx, dy) {
             if (isGameOver || changingDirection) return;
-            if (snakeDirection.x === 0 && snakeDirection.y === 0) { snakeDirection = { x: dx, y: dy }; return; }
             
-            changingDirection = true;
-            const goingUp = snakeDirection.y === -1, goingDown = snakeDirection.y === 1;
-            const goingRight = snakeDirection.x === 1, goingLeft = snakeDirection.x === -1;
-            if (dy === -1 && !goingDown) snakeDirection = { x: 0, y: -1 };
-            if (dy === 1 && !goingUp) snakeDirection = { x: 0, y: 1 };
-            if (dx === -1 && !goingRight) snakeDirection = { x: -1, y: 0 };
-            if (dx === 1 && !goingLeft) snakeDirection = { x: 1, y: 0 };
+            const goingUp = snakeDirection.y === -1;
+            const goingDown = snakeDirection.y === 1;
+            const goingRight = snakeDirection.x === 1;
+            const goingLeft = snakeDirection.x === -1;
+
+            if (dy === -1 && !goingDown) {
+                snakeDirection = { x: 0, y: -1 };
+                changingDirection = true;
+            } else if (dy === 1 && !goingUp) {
+                snakeDirection = { x: 0, y: 1 };
+                changingDirection = true;
+            } else if (dx === -1 && !goingRight) {
+                snakeDirection = { x: -1, y: 0 };
+                changingDirection = true;
+            } else if (dx === 1 && !goingLeft) {
+                snakeDirection = { x: 1, y: 0 };
+                changingDirection = true;
+            }
         }
+
 
         // --- PIXEL INVADERS GAME SCRIPT ---
         let player, invaders, bullets, invaderBullets, invaderDirection, invaderMoveSpeed, invaderCounter, level;
@@ -2079,7 +2088,7 @@
             player = { x: tileCountX / 2, y: tileCountY - 2, width: 2, height: 1, speed: 2 };
             level = 1;
             score = 0;
-            invaderBullets = []; // Initialize invader bullets array
+            invaderBullets = [];
             setupLevel();
             pet.set_state('curious', 1000);
             gameLoopTimeout = requestAnimationFrame(invadersGameLoop);
@@ -2090,14 +2099,13 @@
             invaderBullets = invaderBullets || [];
             invaders = [];
             invaderDirection = 1;
-            invaderMoveSpeed = Math.max(3, 50 - (level * 6)); // Faster speed increase
+            invaderMoveSpeed = Math.max(3, 50 - (level * 6));
             invaderCounter = 0;
             
-            // Progressive difficulty: More invaders, faster movement, enemy bullets
             const baseRows = 4;
             const baseCols = 8;
-            const invaderRows = Math.min(baseRows + Math.floor(level / 3), 6); // More rows at higher levels
-            const invaderCols = Math.min(baseCols + Math.floor(level / 2), 12); // More columns
+            const invaderRows = Math.min(baseRows + Math.floor(level / 3), 6);
+            const invaderCols = Math.min(baseCols + Math.floor(level / 2), 12);
             
             for (let r = 0; r < invaderRows; r++) {
                 for (let c = 0; c < invaderCols; c++) {
@@ -2107,12 +2115,11 @@
                         width: 1.5, 
                         height: 1, 
                         alive: true,
-                        canShoot: level >= 2 // Invaders can shoot starting from level 2
+                        canShoot: level >= 2
                     });
                 }
             }
             
-            // Increase player speed slightly with level
             player.speed = Math.min(3, 2 + (level * 0.1));
         }
         
@@ -2145,7 +2152,6 @@
             invaderCounter = (invaderCounter + 1) % invaderMoveSpeed;
             if (invaderCounter === 0) {
                 moveInvaders();
-                // Random chance for invaders to shoot (higher levels = more frequent)
                 if (level >= 2 && Math.random() < 0.02 + (level * 0.005)) {
                     invaderShoot();
                 }
@@ -2327,30 +2333,23 @@
             pet.set_state('sad', 2000);
         }
 
-        // --- UNIFIED INPUT HANDLING (FIXED) ---
         /**
-         * Processes all keyboard and button inputs.
-         * It now checks for the Konami code sequence and consumes the input if it's a partial or full match,
-         * preventing the keys from triggering unwanted game actions.
+         * [FIXED] Processes all keyboard and button inputs.
+         * It now checks for the Konami code sequence but also passes the input to the game.
          * @param {string} key The key identifier ('arrowup', 'a', 'b', etc.).
          */
         function processInput(key) {
-            const matchType = checkCode(key);
-
-            if (matchType === 2) { // Full match
+            // Check for Konami code completion.
+            if (checkCode(key)) {
                 unlockAchievement('konamiMaster');
                 document.getElementById('open-theme-modal-btn').style.display = 'block';
                 populateThemeModal();
                 themeModal.style.display = 'flex';
                 playConfirm();
-                return; // Consume input, stop further processing
+                return; // Stop further processing if code is completed.
             }
 
-            if (matchType === 1) { // Partial match
-                return; // Consume input, but don't do anything else yet
-            }
-            
-            // If matchType is 0, it means the key was not part of the sequence, so process game logic.
+            // Always process game logic regardless of Konami sequence state.
             if (isGameOver) {
                 if (key === 'b') {
                     playConfirm();
@@ -2390,12 +2389,12 @@
             }
         });
 
-        document.getElementById('btn-up').addEventListener('click', () => processInput('arrowup'));
-        document.getElementById('btn-down').addEventListener('click', () => processInput('arrowdown'));
-        document.getElementById('btn-left').addEventListener('click', () => processInput('arrowleft'));
-        document.getElementById('btn-right').addEventListener('click', () => processInput('arrowright'));
-        document.getElementById('btn-b').addEventListener('click', () => processInput('b'));
-        document.getElementById('btn-a').addEventListener('click', () => processInput('a'));
+        document.getElementById('btn-up').addEventListener('mousedown', () => processInput('arrowup'));
+        document.getElementById('btn-down').addEventListener('mousedown', () => processInput('arrowdown'));
+        document.getElementById('btn-left').addEventListener('mousedown', () => processInput('arrowleft'));
+        document.getElementById('btn-right').addEventListener('mousedown', () => processInput('arrowright'));
+        document.getElementById('btn-b').addEventListener('mousedown', () => processInput('b'));
+        document.getElementById('btn-a').addEventListener('mousedown', () => processInput('a'));
 
         // --- Game Case ---
         const gameCaseModal = document.getElementById('game-case-modal');
