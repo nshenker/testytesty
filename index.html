@@ -492,12 +492,12 @@
         }
         .placed-sticker {
             position: absolute;
-            width: 96px;
-            height: 96px;
+            width: 144px; /* 96px * 1.5 */
+            height: 144px; /* 96px * 1.5 */
             cursor: move;
             z-index: 5;
             user-select: none;
-            font-size: 72px;
+            font-size: 108px; /* 72px * 1.5 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -657,7 +657,24 @@
         .pet-eye.left { left: 10px; }
         .pet-eye.right { right: 10px; }
         .pet-mouth { position: absolute; width: 12px; height: 4px; background-color: var(--pet-eye-color); bottom: 12px; left: 18px; border-radius: 0 0 4px 4px; opacity: 0; transition: all 0.2s ease-in-out; }
-        #pet-thought-bubble { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--screen-bg); border: 2px solid var(--screen-text); border-radius: 10px; padding: 5px 10px; display: none; font-size: 10px; color: var(--screen-text); white-space: nowrap; }
+        #pet-thought-bubble {
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--screen-bg);
+            border: 2px solid var(--screen-text);
+            border-radius: 10px;
+            padding: 8px;
+            display: none;
+            font-size: 10px;
+            color: var(--screen-text);
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 150px;
+            text-align: center;
+            z-index: 10;
+        }
         #pet-thought-bubble.show { display: block; }
 
         /* --- Chatbot Modal --- */
@@ -1557,7 +1574,6 @@
                 settingsModal.style.display = 'none';
             });
             
-            // [FIXED] Added event listener for the clear stickers button
             clearStickersBtn.addEventListener('click', () => {
                 localStorage.removeItem('veridianStickers');
                 document.getElementById('sticker-container').innerHTML = '';
@@ -1658,11 +1674,7 @@
                 
                 this.state = newState;
                 this.el.classList.add(this.state);
-
-                if (newState !== 'thinking') {
-                    this.hide_thought_bubble();
-                }
-
+                
                 if (duration > 0) {
                     this.isInteractive = false;
                     this.state_timeout = setTimeout(() => {
