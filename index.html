@@ -2935,7 +2935,11 @@
             'linear-gradient(45deg, #f0f, #0ff)', // Vaporwave
             'linear-gradient(135deg, #FFD700 25%, #C0C0C0 25%, #C0C0C0 50%, #FFD700 50%, #FFD700 75%, #C0C0C0 75%, #C0C0C0 100%)', // Gold/Silver
             'radial-gradient(circle, #fff, #bbb)', // Chrome
-            'repeating-radial-gradient(circle, #000, #000 10px, #fff 10px, #fff 20px)' // Hypno
+            'repeating-radial-gradient(circle, #000, #000 10px, #fff 10px, #fff 20px)', // Hypno
+            'linear-gradient(to top, #ff4800, #ff8c00, #ffee00)', // Fire
+            'linear-gradient(135deg, #a2d2ff, #ade8f4, #caf0f8)', // Ice
+            'repeating-linear-gradient(45deg, #FFD700, #FFD700 10px, #000000 10px, #000000 20px)', // Caution
+            'radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)' // Galaxy
         ];
 
         function populateCustomizerGrid(gridId, target, options) {
@@ -2965,9 +2969,10 @@
         }
 
         function initializeCustomizer() {
-            populateCustomizerGrid('dpad-customizer-grid', 'dpad', [...controlColors, ...controlPatterns]);
-            populateCustomizerGrid('button-a-customizer-grid', 'button-a', controlColors);
-            populateCustomizerGrid('button-b-customizer-grid', 'button-b', controlColors);
+            const allButtonOptions = [...controlColors, ...controlPatterns];
+            populateCustomizerGrid('dpad-customizer-grid', 'dpad', allButtonOptions);
+            populateCustomizerGrid('button-a-customizer-grid', 'button-a', allButtonOptions);
+            populateCustomizerGrid('button-b-customizer-grid', 'button-b', allButtonOptions);
             loadControlCustomizations();
         }
 
