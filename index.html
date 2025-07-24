@@ -826,7 +826,7 @@
             </div>
         </div>
     </div>
-    <div id="sound-test-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="text-2xl">[SOUND TEST]</h2><span id="close-sound-test-modal" class="close-modal">&times;</span></div><div id="sound-test-grid" class="grid grid-cols-2 gap-4"></div></div></div>
+    
     <div id="pixel-art-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="text-2xl">[PIXEL ART]</h2><span id="close-pixel-art-modal" class="close-modal">&times;</span></div><div id="pixel-art-creator"></div></div></div>
     <div id="chatbot-modal" class="modal-overlay">
         <div class="modal-content">
@@ -1181,29 +1181,6 @@
             }
             renderAchievements();
         }
-        
-        // --- Sound Test Modal ---
-        const soundTestModal = document.getElementById('sound-test-modal');
-        let dPadCenterClicks = 0;
-        document.getElementById('d-pad-center').addEventListener('click', async () => {
-            await initAudioContext();
-            if (++dPadCenterClicks === 5) {
-                dPadCenterClicks = 0;
-                unlockAchievement('soundEngineer');
-                const soundGrid = document.getElementById('sound-test-grid');
-                soundGrid.innerHTML = '';
-                const sounds = { 'BEEP': playBeep, 'CONFIRM': playConfirm, 'POWER UP': playPowerUp, 'GAME OVER': playGameOver, 'PAUSE': playPause, 'FEED': playFeed, 'SAD': playSad, 'SHOOT': playShoot, 'EXPLODE': playExplosion };
-                for (const name in sounds) {
-                    const btn = document.createElement('button');
-                    btn.className = 'social-btn py-2';
-                    btn.textContent = `[${name}]`;
-                    btn.onclick = sounds[name];
-                    soundGrid.appendChild(btn);
-                }
-                soundTestModal.style.display = 'flex';
-            }
-        });
-        document.getElementById('close-sound-test-modal').onclick = () => { soundTestModal.style.display = 'none'; };
         
         // --- Pixel Art Creator ---
         const pixelArtModal = document.getElementById('pixel-art-modal');
