@@ -188,6 +188,7 @@
             --font-family: 'Press Start 2P', cursive;
             --bg-color: #0d2b1d; --text-color: #306230; --header-color: #c4f2c5; --header-sub-color: #76b876; --gb-body-color: #c4c4c4; --gb-body-shadow1: #a9a9a9; --gb-body-shadow2: #e0e0e0; --screen-bg: #9bbc0f; --screen-border: #8bac0f; --screen-text: #0d2b1d; --pixel-color: #306230; --button-color: #a02060; --button-shadow: #601040; --dpad-color: #333;
             --pet-body-color: #76b876; --pet-eye-color: #0d2b1d; --modal-text-color: #0d2b1d; --action-btn-text-color: #fff; --start-select-text-color: #76b876;
+            --dpad-custom-color: var(--dpad-color); --button-a-custom-color: var(--button-color); --button-b-custom-color: var(--button-color);
         }
         .theme-pocket { /* Game Boy Pocket - Grayscale */
             --bg-color: #111; --text-color: #777; --header-color: #fff; --header-sub-color: #bbb; --gb-body-color: #c4c4c4; --gb-body-shadow1: #a9a9a9; --gb-body-shadow2: #e0e0e0; --screen-bg: #e0e0e0; --screen-border: #c4c4c4; --screen-text: #000; --pixel-color: #777; --button-color: #a02060; --button-shadow: #601040; --dpad-color: #333;
@@ -294,9 +295,11 @@
             to { text-shadow: 0 0 20px var(--header-sub-color); }
         }
         .header-sub { color: var(--header-sub-color); }
-        .d-pad-btn { background-color: var(--dpad-color); border: 1px solid rgba(0,0,0,0.2); }
+        .d-pad-btn, .center-piece { background: var(--dpad-custom-color); border: 1px solid rgba(0,0,0,0.2); }
         .era-1995 .d-pad-btn { border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; }
-        .action-btn { background-color: var(--button-color); border-color: var(--button-shadow); box-shadow: 2px 2px 0 var(--button-shadow); color: var(--action-btn-text-color); }
+        #btn-a { background: var(--button-a-custom-color); }
+        #btn-b { background: var(--button-b-custom-color); }
+        .action-btn { border-color: var(--button-shadow); box-shadow: 2px 2px 0 var(--button-shadow); color: var(--action-btn-text-color); }
         .era-1995 .action-btn { border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; box-shadow: none; color: #000; }
         .social-btn { background-color: var(--pixel-color); color: var(--bg-color); }
         .social-btn:hover { background-color: var(--bg-color); color: var(--pixel-color); }
@@ -708,6 +711,31 @@
         #pixel-art-controls { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
         #pixel-art-tools { display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
 
+        /* --- Customizer Modal --- */
+        #customizer-modal .modal-content { max-width: 600px; }
+        .customizer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 10px;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .customizer-swatch {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--pixel-color);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .customizer-swatch.selected {
+            border-color: var(--header-color);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px var(--header-color);
+        }
+
         /* --- Power On Sequence --- */
         #power-on-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 10;
@@ -749,7 +777,7 @@
         #btn-left { grid-column: 1; grid-row: 2; border-radius: 5px 0 0 5px; }
         #btn-right { grid-column: 3; grid-row: 2; border-radius: 0 5px 5px 0; }
         #btn-down { grid-column: 2; grid-row: 3; border-radius: 0 0 5px 5px; }
-        .center-piece { grid-column: 2; grid-row: 2; background-color: var(--dpad-color); cursor: pointer; }
+        .center-piece { grid-column: 2; grid-row: 2; cursor: pointer; }
         .action-buttons { display: flex; justify-content: center; align-items: center; gap: 20px; }
         .action-btn { width: 70px; height: 70px; border-radius: 50%; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; user-select: none; }
         .action-btn:active { transform: translate(2px, 2px); box-shadow: none; }
@@ -857,6 +885,28 @@
                 <span id="close-game-case-modal" class="close-modal">&times;</span>
             </div>
             <div id="game-cartridge-grid"></div>
+        </div>
+    </div>
+    <div id="customizer-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl">[CONTROLS CUSTOMIZER]</h2>
+                <span id="close-customizer-modal" class="close-modal">&times;</span>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg mb-2">[D-PAD STYLE]</h3>
+                    <div id="dpad-customizer-grid" class="customizer-grid"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg mb-2">[A BUTTON]</h3>
+                    <div id="button-a-customizer-grid" class="customizer-grid"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg mb-2">[B BUTTON]</h3>
+                    <div id="button-b-customizer-grid" class="customizer-grid"></div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -1048,6 +1098,8 @@
                     pet.set_state('happy', 500);
                     resizeCanvas();
                     themeModal.style.display = 'none';
+                    // Re-apply custom control colors after theme change
+                    loadControlCustomizations(); 
                 };
                 themeGrid.appendChild(swatch);
             });
@@ -1131,7 +1183,7 @@
             cartridgeCollector: { name: "Cartridge Collector", desc: "Selected a game to play.", unlocked: false, icon: '💾' },
             madeAFriend: { name: "Made a Friend", desc: "Played with the pixel pet.", unlocked: false, icon: '❤️' },
             highScoreAchiever: { name: "Record Breaker", desc: "Set a new high score.", unlocked: false, icon: '🏆' },
-            soundEngineer: { name: "Sound Engineer", desc: "Found the hidden sound test menu.", unlocked: false, icon: '🎵' }
+            customizer: { name: "Customizer", desc: "Found the controls customizer.", unlocked: false, icon: '🔧' }
         };
         const achievementPopup = document.getElementById('achievement-unlocked');
         const achievementName = document.getElementById('achievement-name');
@@ -1554,6 +1606,10 @@
                 // Reset Stickers
                 localStorage.removeItem('veridianStickers');
                 document.getElementById('sticker-container').innerHTML = '';
+                
+                // Reset Controls
+                localStorage.removeItem('veridianControlCustoms');
+                loadControlCustomizations();
 
                 loadPetCustomizations(); 
                 populateStickerGrid();
@@ -1645,7 +1701,7 @@
                 "Try the Konami code...",
                 "The header seems clickable...",
                 "What does the footer say?",
-                "The D-pad center might do something...",
+                "Click the D-pad's center 5 times...",
                 "Maybe the chatbot knows a secret?",
                 "Click the Pioneers header 5 times..."
             ],
@@ -1745,8 +1801,8 @@
                 "secret": "I AM NOT AT LIBERTY TO DISCLOSE SECRETS. BUT HAVE YOU TRIED THE KONAMI CODE?",
                 "konami": "YOU KNOW THE CODE? IMPRESSIVE. BUT CAN YOU FIND THE OTHER SECRETS?",
                 "who are you": "I AM VERIDIAN-AI. A PROTOTYPE AI. I LIVE IN THE WIRES.",
-                "hints": "KONAMI: An ancient code of arrow keys and letters. | MATRIX: Knock on the header. | WISE WORDS: Consult the footer. | GAMING: Excel in the Game Case. | SOUND: The D-Pad's center. | ARTIST: A special click on the Pioneers header. | TIME: Bend time via its nav link. | FRIEND: Interact with the little one.",
-                "achievements": "KONAMI: An ancient code of arrow keys and letters. | MATRIX: Knock on the header. | WISE WORDS: Consult the footer. | GAMING: Excel in the Game Case. | SOUND: The D-Pad's center. | ARTIST: A special click on the Pioneers header. | TIME: Bend time via its nav link. | FRIEND: Interact with the little one.",
+                "hints": "KONAMI: An ancient code. | MATRIX: Knock on the header. | WISE WORDS: Consult the footer. | GAMING: Excel in the Game Case. | CUSTOMIZER: The D-Pad's center. | ARTIST: A special click on the Pioneers header. | TIME: Bend time via its nav link. | FRIEND: Interact with the little one.",
+                "achievements": "KONAMI: An ancient code. | MATRIX: Knock on the header. | WISE WORDS: Consult the footer. | GAMING: Excel in the Game Case. | CUSTOMIZER: The D-Pad's center. | ARTIST: A special click on the Pioneers header. | TIME: Bend time via its nav link. | FRIEND: Interact with the little one.",
                 "bye": "FAREWELL, USER.",
                 "default": "COMMAND NOT RECOGNIZED. PLEASE TRY 'HELP'."
             },
@@ -2865,6 +2921,97 @@
             loadStickers();
         }
 
+        // --- CONTROLS CUSTOMIZER ---
+        const customizerModal = document.getElementById('customizer-modal');
+        const closeCustomizerModal = document.getElementById('close-customizer-modal');
+        let dpadCenterClicks = 0;
+
+        const controlColors = [
+            '#FF3B30', '#FF9500', '#FFCC00', '#4CD964', '#34C759', '#5AC8FA', '#007AFF', '#5856D6', '#AF52DE', '#FF2D55',
+            '#FFFFFF', '#8E8E93', '#333333', '#000000'
+        ];
+        const controlPatterns = [
+            'linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff)', // Rainbow
+            'linear-gradient(45deg, #f0f, #0ff)', // Vaporwave
+            'linear-gradient(135deg, #FFD700 25%, #C0C0C0 25%, #C0C0C0 50%, #FFD700 50%, #FFD700 75%, #C0C0C0 75%, #C0C0C0 100%)', // Gold/Silver
+            'radial-gradient(circle, #fff, #bbb)', // Chrome
+            'repeating-radial-gradient(circle, #000, #000 10px, #fff 10px, #fff 20px)' // Hypno
+        ];
+
+        function populateCustomizerGrid(gridId, target, options) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            options.forEach(option => {
+                const swatch = document.createElement('div');
+                swatch.className = 'customizer-swatch';
+                swatch.style.background = option;
+                swatch.dataset.value = option;
+                swatch.onclick = () => {
+                    const varName = `--${target}-custom-color`;
+                    document.documentElement.style.setProperty(varName, option);
+                    
+                    // Save to local storage
+                    const customs = JSON.parse(localStorage.getItem('veridianControlCustoms')) || {};
+                    customs[target] = option;
+                    localStorage.setItem('veridianControlCustoms', JSON.stringify(customs));
+
+                    // Update selection visual
+                    grid.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                    playBeep();
+                };
+                grid.appendChild(swatch);
+            });
+        }
+
+        function initializeCustomizer() {
+            populateCustomizerGrid('dpad-customizer-grid', 'dpad', [...controlColors, ...controlPatterns]);
+            populateCustomizerGrid('button-a-customizer-grid', 'button-a', controlColors);
+            populateCustomizerGrid('button-b-customizer-grid', 'button-b', controlColors);
+            loadControlCustomizations();
+        }
+
+        function loadControlCustomizations() {
+            const customs = JSON.parse(localStorage.getItem('veridianControlCustoms')) || {};
+            const rootStyle = document.documentElement.style;
+
+            // Set defaults from the theme first
+            rootStyle.setProperty('--dpad-custom-color', 'var(--dpad-color)');
+            rootStyle.setProperty('--button-a-custom-color', 'var(--button-color)');
+            rootStyle.setProperty('--button-b-custom-color', 'var(--button-color)');
+            
+            // Apply saved customizations over the defaults
+            if (customs.dpad) rootStyle.setProperty('--dpad-custom-color', customs.dpad);
+            if (customs['button-a']) rootStyle.setProperty('--button-a-custom-color', customs['button-a']);
+            if (customs['button-b']) rootStyle.setProperty('--button-b-custom-color', customs['button-b']);
+
+            // Update selected swatches in the modal
+            updateSwatchSelection('dpad-customizer-grid', customs.dpad);
+            updateSwatchSelection('button-a-customizer-grid', customs['button-a']);
+            updateSwatchSelection('button-b-customizer-grid', customs['button-b']);
+        }
+        
+        function updateSwatchSelection(gridId, value) {
+            const grid = document.getElementById(gridId);
+            grid.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            if (value) {
+                const swatch = grid.querySelector(`[data-value="${value}"]`);
+                if (swatch) swatch.classList.add('selected');
+            }
+        }
+
+        document.getElementById('d-pad-center').addEventListener('click', () => {
+            dpadCenterClicks++;
+            if (dpadCenterClicks === 5) {
+                dpadCenterClicks = 0;
+                unlockAchievement('customizer');
+                customizerModal.style.display = 'flex';
+                playConfirm();
+            }
+            setTimeout(() => { dpadCenterClicks = 0; }, 2000);
+        });
+        closeCustomizerModal.onclick = () => { customizerModal.style.display = 'none'; };
+
 
         // --- INITIAL LOAD ---
         function powerOnAndLoadGame(gameId) {
@@ -2921,6 +3068,7 @@
             displayPioneer(0);
             initializePetCustomization();
             initializeStickers();
+            initializeCustomizer();
             setupResetListeners();
             setupScrollAnimations();
             updateFaviconFrames();
