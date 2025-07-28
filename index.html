@@ -906,6 +906,7 @@
                     <h3 class="text-lg mb-2">[B BUTTON]</h3>
                     <div id="button-b-customizer-grid" class="customizer-grid"></div>
                 </div>
+                <button id="reset-controls-btn" class="social-btn reset-btn w-full mt-4 text-sm py-1">[RESET CONTROLS]</button>
             </div>
         </div>
     </div>
@@ -2973,6 +2974,13 @@
             populateCustomizerGrid('dpad-customizer-grid', 'dpad', allButtonOptions);
             populateCustomizerGrid('button-a-customizer-grid', 'button-a', allButtonOptions);
             populateCustomizerGrid('button-b-customizer-grid', 'button-b', allButtonOptions);
+            
+            document.getElementById('reset-controls-btn').addEventListener('click', () => {
+                localStorage.removeItem('veridianControlCustoms');
+                loadControlCustomizations();
+                playBeep();
+            });
+
             loadControlCustomizations();
         }
 
