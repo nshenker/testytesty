@@ -493,6 +493,7 @@
             text-shadow: 3px 3px #000;
             pointer-events: none;
             transform-origin: center center;
+            transition: transform 0.1s linear; /* Added for smooth rotation */
         }
         body.sticker-edit-mode .placed-sticker {
             pointer-events: auto;
@@ -862,6 +863,7 @@
                 
                 <div>
                     <h3 class="text-lg mb-2">[STICKERS]</h3>
+                    <p class="text-xs mb-2" style="color: var(--text-color);">Double-click a placed sticker to rotate it!</p>
                     <div id="sticker-grid"></div>
                     <div class="flex gap-2 mt-2">
                         <button id="edit-stickers-btn" class="social-btn w-full text-sm py-1">[EDIT]</button>
@@ -2826,7 +2828,12 @@
                 stickerItem.dataset.id = id;
                 stickerItem.title = sticker.name;
                 stickerItem.innerHTML = sticker.icon;
-                stickerItem.addEventListener('click', () => placeSticker(id));
+                stickerItem.addEventListener('click', () => placeSticker({
+                    id: id,
+                    x: 50,
+                    y: 50,
+                    rotation: 0
+                }));
                 stickerGrid.appendChild(stickerItem);
             }
 
@@ -2840,25 +2847,37 @@
                 stickerItem.innerHTML = ach.icon;
                 if (ach.unlocked) {
                     stickerItem.classList.add('unlocked');
-                    stickerItem.addEventListener('click', () => placeSticker(id));
+                    stickerItem.addEventListener('click', () => placeSticker({
+                        id: id,
+                        x: 50,
+                        y: 50,
+                        rotation: 0
+                    }));
                 }
                 stickerGrid.appendChild(stickerItem);
             }
         }
 
-        function placeSticker(id, pos = { x: 50, y: 50 }) {
-            const stickerData = defaultStickers[id] || achievements[id];
-            if (!stickerData) return;
+        function placeSticker(stickerData) {
+            const allStickers = { ...defaultStickers, ...achievements };
+            const stickerInfo = allStickers[stickerData.id];
+            if (!stickerInfo) return;
 
             const sticker = document.createElement('div');
             sticker.className = 'placed-sticker';
-            sticker.dataset.id = id;
-            sticker.innerHTML = stickerData.icon;
-            sticker.style.left = `${pos.x}%`;
-            sticker.style.top = `${pos.y}%`;
+            sticker.dataset.id = stickerData.id;
+            sticker.innerHTML = stickerInfo.icon;
+            
+            // Set position and rotation
+            sticker.style.left = `${stickerData.x}%`;
+            sticker.style.top = `${stickerData.y}%`;
+            const rotation = stickerData.rotation || 0;
+            sticker.style.transform = `rotate(${rotation}deg)`;
+            sticker.dataset.rotation = rotation;
+
             stickerContainer.appendChild(sticker);
             
-            makeDraggable(sticker);
+            makeStickerInteractive(sticker);
             
             if (!stickerEditMode) {
                 document.getElementById('edit-stickers-btn').click();
@@ -2866,13 +2885,31 @@
             return sticker;
         }
         
-        function makeDraggable(element) {
+        function makeStickerInteractive(element) {
             element.addEventListener('mousedown', startDrag);
             element.addEventListener('touchstart', startDrag, { passive: false });
+
+            // NEW: Add double-click listener for rotation
+            element.addEventListener('dblclick', (e) => {
+                if (!stickerEditMode) return;
+                e.preventDefault();
+                
+                let currentRotation = parseFloat(element.dataset.rotation) || 0;
+                currentRotation = (currentRotation + 15) % 360; // Add 15 degrees
+                
+                element.dataset.rotation = currentRotation;
+                element.style.transform = `rotate(${currentRotation}deg)`;
+                playBeep();
+            });
         }
 
         function startDrag(e) {
             if (!stickerEditMode) return;
+            // Prevent dblclick from firing
+            if (e.detail > 1) {
+                e.preventDefault();
+                return;
+            }
             e.preventDefault();
             draggedSticker = e.target;
             const rect = draggedSticker.parentElement.getBoundingClientRect();
@@ -2922,7 +2959,8 @@
                 stickers.push({
                     id: sticker.dataset.id,
                     x: parseFloat(sticker.style.left),
-                    y: parseFloat(sticker.style.top)
+                    y: parseFloat(sticker.style.top),
+                    rotation: parseFloat(sticker.dataset.rotation) || 0
                 });
             });
             localStorage.setItem('veridianStickers', JSON.stringify(stickers));
@@ -2933,7 +2971,7 @@
             const savedStickers = JSON.parse(localStorage.getItem('veridianStickers'));
             if (savedStickers) {
                 savedStickers.forEach(stickerData => {
-                    placeSticker(stickerData.id, { x: stickerData.x, y: stickerData.y });
+                    placeSticker(stickerData);
                 });
             }
             if (document.body.classList.contains('sticker-edit-mode')) {
@@ -3237,8 +3275,81 @@
         });
 
         // --- INITIAL LOAD ---
+        // NEW: Cartridge insertion animation function
+        function playCartridgeInsertAnimation(gameId, callback) {
+            const game = games.find(g => g.id === gameId);
+            if (!game) {
+                callback(); // Failsafe
+                return;
+            }
+
+            let y = -canvas.height / 2; // Start position above the screen
+            const endY = canvas.height / 10;
+            const speed = 8;
+            let flicker = 0;
+
+            function animate() {
+                clearCanvas();
+
+                // Draw cartridge slot
+                const slotHeight = TILE_SIZE * 1.5;
+                ctx.fillStyle = getThemeColor('--gb-body-shadow1');
+                ctx.fillRect(0, 0, canvas.width, slotHeight);
+                ctx.fillStyle = getThemeColor('--gb-body-shadow2');
+                ctx.fillRect(0, 0, canvas.width, slotHeight / 4);
+
+                // Cartridge dimensions
+                const cartWidth = canvas.width * 0.6;
+                const cartHeight = canvas.height * 0.4;
+                const cartX = (canvas.width - cartWidth) / 2;
+
+                // Draw cartridge body
+                ctx.fillStyle = getThemeColor('--dpad-color');
+                ctx.fillRect(cartX, y, cartWidth, cartHeight);
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(cartX, y, cartWidth, TILE_SIZE); // Top edge shadow
+
+                // Draw label
+                const labelX = cartX + TILE_SIZE / 2;
+                const labelY = y + TILE_SIZE * 1.5;
+                const labelWidth = cartWidth - TILE_SIZE;
+                const labelHeight = cartHeight - TILE_SIZE * 2;
+                ctx.fillStyle = getThemeColor('--screen-border');
+                ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
+                
+                // Draw text on label
+                ctx.fillStyle = getThemeColor('--screen-text');
+                ctx.font = `bold ${TILE_SIZE*0.7}px 'Press Start 2P'`;
+                ctx.textAlign = 'center';
+                ctx.fillText(game.title, canvas.width / 2, labelY + labelHeight / 2 + TILE_SIZE/4);
+
+                y += speed;
+
+                if (y < endY) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // "Click" into place and flicker
+                    playBeep();
+                    const flickerInterval = setInterval(() => {
+                        clearCanvas();
+                        if (flicker % 2 === 0) {
+                            ctx.fillStyle = getThemeColor('--screen-text');
+                            ctx.fillRect(0,0,canvas.width, canvas.height);
+                        }
+                        flicker++;
+                        if (flicker > 4) {
+                            clearInterval(flickerInterval);
+                            callback(); // Start the actual game
+                        }
+                    }, 50);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
         function powerOnAndLoadGame(gameId) {
             stopCurrentGame(); // Always stop the previous game first.
+            const gameLoadCallback = () => playCartridgeInsertAnimation(gameId, () => initializeGame(gameId));
 
             // If we haven't done the initial power-on animation yet...
             if (!hasPoweredOn) {
@@ -3250,11 +3361,11 @@
                 setTimeout(() => {
                     powerScreen.style.opacity = '0';
                     powerScreen.style.pointerEvents = 'none';
-                    initializeGame(gameId); // Load the game AFTER the animation
+                    gameLoadCallback(); // Load the game AFTER the animation
                 }, 2500);
             } else {
-                // If we have already powered on, just load the game immediately.
-                initializeGame(gameId);
+                // If we have already powered on, just play the cartridge animation
+                gameLoadCallback();
             }
         }
 
