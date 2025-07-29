@@ -792,6 +792,41 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Veridian Archives Specific Styles */
+        #archives-screen {
+            background-color: var(--screen-bg);
+            color: var(--screen-text);
+            border: 4px solid var(--screen-border);
+            padding: 20px;
+            min-height: 200px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            image-rendering: pixelated;
+        }
+        .archive-choice-btn {
+            background-color: var(--button-color);
+            color: var(--action-btn-text-color);
+            border: 2px solid var(--button-shadow);
+            box-shadow: 2px 2px 0 var(--button-shadow);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            transition: all 0.1s ease-in-out;
+        }
+        .archive-choice-btn:hover {
+            filter: brightness(1.2);
+        }
+        .archive-choice-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+        .era-1995 .archive-choice-btn {
+            border-style: solid; border-width: 2px; border-color: #DFDFDF #808080 #808080 #DFDFDF; box-shadow: none; color: #000;
+        }
     </style>
 </head>
 <body>
@@ -834,8 +869,8 @@
                 </div>
 
                 <div>
-                     <h3 class="text-lg mb-2 pt-4 border-t-2 border-dashed" style="border-color: var(--pixel-color);">[DANGER ZONE]</h3>
-                     <button id="reset-achievements-btn" class="social-btn reset-btn w-full">[RESET ALL PROGRESS]</button>
+                    <h3 class="text-lg mb-2 pt-4 border-t-2 border-dashed" style="border-color: var(--pixel-color);">[DANGER ZONE]</h3>
+                    <button id="reset-achievements-btn" class="social-btn reset-btn w-full">[RESET ALL PROGRESS]</button>
                 </div>
 
                 <button id="open-theme-modal-btn" class="social-btn px-4 py-2 text-sm w-full mt-4" style="display: none;">[SELECT THEME]</button>
@@ -944,7 +979,7 @@
                 <div id="btn-start" class="start-select-btn">START</div>
             </div>
         </div>
-        <nav class="text-center mb-16"><ul class="flex flex-wrap justify-center space-x-4 md:space-x-8 text-lg"><li><a href="#features" class="hover:text-white interactive-sound">[FEATURES]</a></li><li><a href="#roadmap" class="hover:text-white interactive-sound">[ROADMAP]</a></li><li><a href="#team" class="hover:text-white interactive-sound">[PIONEERS]</a></li><li><a href="#achievements" class="hover:text-white interactive-sound">[ACHIEVEMENTS]</a></li><li id="time-travel-nav"><a href="#" class="hover:text-white interactive-sound">[TIME TRAVEL]</a></li><li><a href="#community" class="hover:text-white interactive-sound">[COMMUNITY]</a></li></ul></nav>
+        <nav class="text-center mb-16"><ul class="flex flex-wrap justify-center space-x-4 md:space-x-8 text-lg"><li><a href="#features" class="hover:text-white interactive-sound">[FEATURES]</a></li><li><a href="#roadmap" class="hover:text-white interactive-sound">[ROADMAP]</a></li><li><a href="#team" class="hover:text-white interactive-sound">[PIONEERS]</a></li><li><a href="#achievements" class="hover:text-white interactive-sound">[ACHIEVEMENTS]</a></li><li id="time-travel-nav"><a href="#" class="hover:text-white interactive-sound">[TIME TRAVEL]</a></li><li><a href="#archives" class="hover:text-white interactive-sound">[ARCHIVES]</a></li><li><a href="#community" class="hover:text-white interactive-sound">[COMMUNITY]</a></li></ul></nav>
         <section id="features" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[TOKEN FEATURES]</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="pixel-border-inset p-4 text-center"><img src="https://placehold.co/300x200/9bbc0f/0d2b1d?text=FOR+GAMERS" alt="For Gamers" class="w-full mb-4 pixel-border" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Image+Error';"><h3 class="text-xl mb-2">For Gamers</h3><p class="text-sm">The native currency of our upcoming retro gaming community.</p></div><div class="pixel-border-inset p-4 text-center"><img src="https://placehold.co/300x200/9bbc0f/0d2b1d?text=BY GAMERS" alt="BY GAMERS" class="w-full mb-4 pixel-border" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Image+Error';"><h3 class="text-xl mb-2">Decentralized</h3><p class="text-sm">Built by those who play, run by those who game.</p></div><div class="pixel-border-inset p-4 text-center"><img src="https://placehold.co/300x200/9bbc0f/0d2b1d?text=COMMUNITY" alt="Community" class="w-full mb-4 pixel-border" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Image+Error';"><h3 class="text-xl mb-2">Community</h3><p class="text-sm">Putting holders first, profit last.</p></div></div></section>
         <section id="roadmap" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[ROADMAP]</h2><div class="pixel-border-inset p-6"><div class="roadmap-container"><div class="roadmap-node completed"><div class="node-icon"></div><p class="node-text">Q3 2025: TOKEN LAUNCH</p></div><div class="roadmap-connector"></div><div class="roadmap-node completed"><div class="node-icon"></div><p class="node-text">Q3 2025: Merch and Branding</p></div><div class="roadmap-connector"></div><div class="roadmap-node"><div class="node-icon"></div><p class="node-text">Q4 2025: International Tournaments</p></div><div class="roadmap-connector"></div><div class="roadmap-node"><div class="node-icon"></div><p class="node-text">Q1 2026: FIRST GAME FUNDED</p></div></div></div></section>
         <section id="team" class="mb-16 fade-in-section">
@@ -972,6 +1007,20 @@
             </div>
         </section>
         <section id="achievements" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[ACHIEVEMENTS]</h2><div id="achievements-list" class="pixel-border-inset p-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div></section>
+        
+        <!-- Veridian Archives Section -->
+        <section id="archives" class="mb-16 fade-in-section">
+            <h2 class="text-3xl text-center mb-8 header-main">[VERIDIAN ARCHIVES]</h2>
+            <div class="pixel-border-inset p-6">
+                <div id="archives-screen">
+                    <p id="archive-text"></p>
+                </div>
+                <div id="archive-choices" class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+                    <!-- Choices will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+
         <section id="community" class="mb-16 fade-in-section"><h2 class="text-3xl text-center mb-8 header-main">[JOIN THE COMMUNITY]</h2><div class="pixel-border-inset p-6"><div class="flex flex-col items-center space-y-6"><p class="text-center">Follow our progress and chat with the team on our social channels.</p><a href="https://x.com/veridiancity" target="_blank" class="w-full max-w-sm text-center social-btn py-3 text-lg pixel-border interactive-sound">X / TWITTER</a><a href="https://t.me/veridiancity" target="_blank" class="w-full max-w-sm text-center social-btn py-3 text-lg pixel-border interactive-sound">TELEGRAM</a><a href="#" target="_blank" class="w-full max-w-sm text-center social-btn py-3 text-lg pixel-border interactive-sound">DISCORD</a></div></div></section>
         <footer class="text-center pt-8"><p id="footer-text" class="blinking-text cursor-pointer">© 2025 VERIDIAN CITY STUDIOS</p></footer>
     </div>
@@ -1184,7 +1233,8 @@
             cartridgeCollector: { name: "Cartridge Collector", desc: "Selected a game to play.", unlocked: false, icon: '💾' },
             madeAFriend: { name: "Made a Friend", desc: "Played with the pixel pet.", unlocked: false, icon: '❤️' },
             highScoreAchiever: { name: "Record Breaker", desc: "Set a new high score.", unlocked: false, icon: '🏆' },
-            customizer: { name: "Customizer", desc: "Found the controls customizer.", unlocked: false, icon: '🔧' }
+            customizer: { name: "Customizer", desc: "Found the controls customizer.", unlocked: false, icon: '🔧' },
+            loreMaster: { name: "Lore Master", desc: "Explored the Veridian Archives.", unlocked: false, icon: '📚' } // New achievement
         };
         const achievementPopup = document.getElementById('achievement-unlocked');
         const achievementName = document.getElementById('achievement-name');
@@ -1568,12 +1618,12 @@
             const savedColor = localStorage.getItem('veridianPetColor');
             if (savedColor) {
                 document.documentElement.style.setProperty('--pet-body-color', savedColor);
-                 petColorPalette.querySelector('.selected')?.classList.remove('selected');
+                petColorPalette.querySelector('.selected')?.classList.remove('selected');
                 const currentSwatch = petColorPalette.querySelector(`[data-color="${savedColor}"]`);
                 if(currentSwatch) currentSwatch.classList.add('selected');
             } else {
                 // Select the default color swatch
-                 petColorPalette.querySelector('.selected')?.classList.remove('selected');
+                petColorPalette.querySelector('.selected')?.classList.remove('selected');
                 const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--pet-body-color').trim();
                 const defaultSwatch = petColorPalette.querySelector(`[data-color="${defaultColor}"]`);
                 if(defaultSwatch) defaultSwatch.classList.add('selected');
@@ -2658,7 +2708,7 @@
                     line.style.top = `${i * 5}%`;
                     bgContainer.appendChild(line);
                 }
-                 for (let i = 0; i < 20; i++) { // Vertical lines
+                for (let i = 0; i < 20; i++) { // Vertical lines
                     const line = document.createElement('div');
                     line.className = 'grid-line';
                     line.style.height = '100%';
@@ -2668,7 +2718,7 @@
                 }
             } else if (document.body.classList.contains('theme-forest')) {
                 bgContainer.style.background = 'linear-gradient(to bottom, #283618 0%, #606c38 100%)';
-                 for (let i = 0; i < 15; i++) {
+                for (let i = 0; i < 15; i++) {
                     const leaf = document.createElement('div');
                     leaf.className = 'leaf';
                     const size = Math.random() * 10 + 5;
@@ -3025,6 +3075,155 @@
         });
         closeCustomizerModal.onclick = () => { customizerModal.style.display = 'none'; };
 
+
+        // --- VERIDIAN ARCHIVES (TEXT ADVENTURE) ---
+        const archiveTextElement = document.getElementById('archive-text');
+        const archiveChoicesElement = document.getElementById('archive-choices');
+        const archivesNav = document.querySelector('a[href="#archives"]');
+
+        const archiveScenes = {
+            intro: {
+                text: "YEAR 20XX: THE DIGITAL CRUMBLE. THE OLD NET FADES. A NEW ERA DAWNS. WILL YOU SEEK THE TRUTH OF VERIDIAN CITY'S PAST, OR FORGE A NEW FUTURE?",
+                choices: [
+                    { text: "SEEK THE TRUTH", next: "chapter1_start" },
+                    { text: "FORGE A NEW FUTURE", next: "chapter_new_future" }
+                ]
+            },
+            chapter1_start: {
+                text: "YOU ARE IN THE ABANDONED DATA VAULT. DUST COVERS TERMINALS. A FAINT HUM EMANATES FROM A SINGLE, ANCIENT SERVER. DO YOU APPROACH?",
+                choices: [
+                    { text: "APPROACH THE SERVER", next: "server_console" },
+                    { text: "SEARCH THE ROOM", next: "data_vault_search" }
+                ]
+            },
+            server_console: {
+                text: "THE SERVER SCREEN FLICKERS TO LIFE. 'ACCESS GRANTED: VERIDIAN CITY PROTOCOL V.01'. A LOG FILE APPEARS. READ LOGS?",
+                choices: [
+                    { text: "READ LOGS", next: "logs_read" },
+                    { text: "RETURN TO VAULT", next: "chapter1_start" }
+                ]
+            },
+            logs_read: {
+                text: "LOG ENTRY 001: 'INITIALIZING PROTOCOL VCS. MISSION: PRESERVE RETRO GAMING CULTURE.' LOG ENTRY 002: 'COMMUNITY GROWTH EXCEEDS EXPECTATIONS. UNEXPECTED DATA CORRUPTION DETECTED.' END OF LOGS. WHAT NOW?",
+                choices: [
+                    { text: "INVESTIGATE CORRUPTION", next: "corruption_investigate" },
+                    { text: "EXIT ARCHIVES", next: "end_archives" }
+                ]
+            },
+            data_vault_search: {
+                text: "YOU FIND A BROKEN GAME CARTRIDGE. IT'S LABELED 'LOST LEVELS'. A MESSAGE IS ETCHED ON ITS SIDE: 'THE GLITCH IS THE KEY'. WHAT DO YOU DO?",
+                choices: [
+                    { text: "TRY TO FIX CARTRIDGE", next: "fix_cartridge" },
+                    { text: "RETURN TO VAULT", next: "chapter1_start" }
+                ]
+            },
+            fix_cartridge: {
+                text: "THE CARTRIDGE SPARKS, BUT NOTHING HAPPENS. PERHAPS THE GLITCH IS NOT PHYSICAL. YOU FEEL A SHIFT IN THE AIR. A NEW PATH OPENS. WHERE DO YOU GO?",
+                choices: [
+                    { text: "FOLLOW THE SHIFT", next: "corruption_investigate" },
+                    { text: "GIVE UP", next: "end_archives" }
+                ]
+            },
+            corruption_investigate: {
+                text: "THE AIR SHIMMERS. YOU ARE IN A DIGITAL REALM, PIXELS SWIRLING. A GLITCHING ENTITY BLOCKS YOUR PATH. 'WHO DARES DISTURB THE CORE?' IT ASKS. FIGHT OR FLEE?",
+                choices: [
+                    { text: "FIGHT THE GLITCH", next: "glitch_fight" },
+                    { text: "ATTEMPT TO COMMUNICATE", next: "glitch_communicate" }
+                ]
+            },
+            glitch_fight: {
+                text: "YOUR EFFORTS ARE FUTILE. THE GLITCH ABSORBS YOUR ATTACKS. YOU ARE SENT BACK. TRY AGAIN LATER.",
+                choices: [
+                    { text: "RESTART ARCHIVES", next: "intro" }
+                ]
+            },
+            glitch_communicate: {
+                text: "YOU ATTEMPT TO COMMUNICATE. THE GLITCH SHIMMERS. 'I AM THE MEMORY FRAGMENT. I PROTECT THE CORE. ONLY THOSE WHO UNDERSTAND THE OLD WAYS MAY PASS.' IT FADES. A NEW PATH IS REVEALED.",
+                choices: [
+                    { text: "ENTER THE CORE", next: "core_revealed" }
+                ]
+            },
+            core_revealed: {
+                text: "YOU ENTER THE CORE. IT'S A VAST, BRIGHT CHAMBER FILLED WITH FLOATING DATA PACKETS. YOU SEE THE TRUE HISTORY OF VERIDIAN CITY, UNCORRUPTED. YOU HAVE FOUND THE LORE. CONGRATULATIONS!",
+                choices: [
+                    { text: "EXIT ARCHIVES", next: "end_archives" }
+                ]
+            },
+            chapter_new_future: {
+                text: "YOU DECIDE TO FOCUS ON THE FUTURE. THE ARCHIVES FADE BEHIND YOU. YOUR JOURNEY CONTINUES ON THE MAIN WEBSITE.",
+                choices: [
+                    { text: "RETURN TO MAIN SITE", next: "end_archives" }
+                ]
+            },
+            end_archives: {
+                text: "THE ARCHIVES CLOSE. YOU RETURN TO THE PRESENT. YOUR KNOWLEDGE HAS GROWN.",
+                choices: [
+                    { text: "RESTART ARCHIVES", next: "intro" },
+                    { text: "CLOSE", next: "close_archives" }
+                ]
+            }
+        };
+
+        let currentArchiveScene = 'intro';
+        let typingInterval;
+
+        function displayArchiveScene(sceneId) {
+            unlockAchievement('loreMaster'); // Unlock achievement when archives are accessed
+            const scene = archiveScenes[sceneId];
+            if (!scene) {
+                console.error("Archive scene not found:", sceneId);
+                return;
+            }
+
+            currentArchiveScene = sceneId;
+            archiveChoicesElement.innerHTML = '';
+            archiveTextElement.textContent = '';
+            
+            let i = 0;
+            const textToType = scene.text;
+            if (typingInterval) clearInterval(typingInterval);
+
+            typingInterval = setInterval(() => {
+                if (i < textToType.length) {
+                    archiveTextElement.textContent += textToType.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    // Display choices after typing is complete
+                    scene.choices.forEach(choice => {
+                        const button = document.createElement('button');
+                        button.textContent = `[${choice.text}]`;
+                        button.className = 'archive-choice-btn';
+                        button.addEventListener('click', () => {
+                            playBeep();
+                            if (choice.next === "close_archives" || choice.next === "end_archives") {
+                                const archivesSection = document.getElementById('archives');
+                                archivesSection.classList.remove('is-visible'); // Start fade-out
+                                setTimeout(() => {
+                                    archivesSection.style.display = 'none'; // Hide after transition
+                                }, 600); // Match CSS transition duration
+                            }
+                            else {
+                                displayArchiveScene(choice.next);
+                            }
+                        });
+                        archiveChoicesElement.appendChild(button);
+                    });
+                }
+            }, 30); // Typing speed
+
+            // Ensure the archives section is visible and triggers fade-in
+            const archivesSection = document.getElementById('archives');
+            archivesSection.style.display = 'block'; 
+            archivesSection.classList.add('is-visible'); 
+        }
+
+        archivesNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            displayArchiveScene('intro');
+            // Scroll to the archives section
+            document.getElementById('archives').scrollIntoView({ behavior: 'smooth' });
+        });
 
         // --- INITIAL LOAD ---
         function powerOnAndLoadGame(gameId) {
