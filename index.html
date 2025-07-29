@@ -319,9 +319,9 @@
             box-shadow: 1px 1px 0px rgba(0,0,0,0.4);
         }
         .start-select-btn:active {
-             filter: brightness(0.8);
-             transform: rotate(-30deg) translate(1px, 1px);
-             box-shadow: none;
+            filter: brightness(0.8);
+            transform: rotate(-30deg) translate(1px, 1px);
+            box-shadow: none;
         }
 
         /* --- Modals --- */
@@ -364,8 +364,8 @@
             cursor: pointer;
         }
         .theme-swatch .mini-gameboy {
-             border: 2px solid transparent;
-             transition: border-color: 0.2s;
+            border: 2px solid transparent;
+            transition: border-color: 0.2s;
         }
         .theme-swatch:hover .mini-gameboy {
             border-color: var(--header-color);
@@ -1434,7 +1434,7 @@
             };
 
             const erasePixel = (index) => {
-                 if(index < 0 || index >= gridData.length) return;
+                if(index < 0 || index >= gridData.length) return;
                 gridData[index] = getThemeColor('--screen-bg');
                 gridContainer.children[index].style.backgroundColor = getThemeColor('--screen-bg');
             }
@@ -1678,7 +1678,7 @@
 
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) {
-                 settingsModal.style.display = 'none';
+                settingsModal.style.display = 'none';
             }
         });
         closeSettingsModal.onclick = () => {
@@ -1986,7 +1986,7 @@
             if(currentGameId === null) { 
                 const powerScreen = document.getElementById('power-on-screen');
                 if (powerScreen.style.opacity === '0') {
-                     showInsertCartridgeScreen();
+                    showInsertCartridgeScreen();
                 }
             }
         }
@@ -2734,10 +2734,10 @@
                     bgContainer.appendChild(leaf);
                 }
             } else if (document.body.classList.contains('theme-sunset')) {
-                 bgContainer.style.background = 'linear-gradient(to bottom, #2c0e3a 0%, #e57c3d 100%)';
-                 const sun = document.createElement('div');
-                 sun.className = 'sunset-glow';
-                 bgContainer.appendChild(sun);
+                bgContainer.style.background = 'linear-gradient(to bottom, #2c0e3a 0%, #e57c3d 100%)';
+                const sun = document.createElement('div');
+                sun.className = 'sunset-glow';
+                bgContainer.appendChild(sun);
             } else if (document.body.classList.contains('theme-arcade')) {
                 // The background is handled by CSS with a repeating SVG
             } else if (document.body.classList.contains('theme-blueprint')) {
@@ -3285,7 +3285,7 @@
 
             let y = -canvas.height / 2; // Start position above the screen
             const endY = canvas.height / 10;
-            const speed = 8;
+            const speed = 4; // Slower speed for a more deliberate animation
             let flicker = 0;
 
             function animate() {
@@ -3337,11 +3337,14 @@
                             ctx.fillRect(0,0,canvas.width, canvas.height);
                         }
                         flicker++;
-                        if (flicker > 4) {
+                        if (flicker > 8) { // Longer flicker effect
                             clearInterval(flickerInterval);
-                            callback(); // Start the actual game
+                            // Pause before loading the game
+                            setTimeout(() => {
+                                callback(); // Finally, start the game
+                            }, 750); // 750ms pause
                         }
-                    }, 50);
+                    }, 75); // Slower flicker interval
                 }
             }
             requestAnimationFrame(animate);
